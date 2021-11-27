@@ -16,6 +16,7 @@ class CreateRoomMessagesTable extends Migration
         Schema::create('room_messages', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->string('message') -> nullable();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('room_id')
                 ->constrained()

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MessageSent;
 use App\Models\Room;
 use App\Models\RoomMessage;
 use App\Models\Voca;
 use App\Models\Word;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -56,11 +58,24 @@ class MainPageController extends Controller
 
     public function index_game($room_id) {
 
-        if(RoomMessage::where('room_id', $room_id) -> where('user_id', auth() -> user() -> id)  -> doesntExist())
+//        if(RoomMessage::where('room_id', $room_id) -> where('user_id', auth() -> user() -> id)  -> doesntExist())
+//            return Inertia::render('Error/Error_BadConnection');
+        if(Room::where('id',$room_id) -> doesntExist())
             return Inertia::render('Error/Error_BadConnection');
-
         $room = Room::find($room_id);
+
+
+        if(RoomMessage::where('user_id',auth() -> user() -> id) -> doesntExist()) {
+            $room_message = new RoomMessage();
+            $room_message -> user_id = auth() -> user() ->id;
+            $room_message -> room_id = $room -> id;
+            $room_message -> save();
+        }
+
+
         $users = RoomMessage::where('room_id', $room_id) -> with('user') -> get();
+        MessageSent::dispatch($users, $room_id, 0);
+
 
         return Inertia::render('Main/GameRoom', ['users' => $users, 'room'=>$room]);
     }

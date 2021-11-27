@@ -91,5 +91,7 @@ Route::middleware(['auth:sanctum', 'verified'])->
         Route::prefix('game') -> group(function () {
             Route::post('/store', [GameController::class, 'store']);
            Route::post('/messages/{room_id}', [GameController::class, 'send_messages']);
+           Route::get('/member/{room_id}', [GameController::class, 'member']);
+           Route::delete('/delete/{room_id}', [GameController::class, 'destroy']);
         });
     });

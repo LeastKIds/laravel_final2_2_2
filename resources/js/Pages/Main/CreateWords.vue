@@ -420,6 +420,10 @@ export default {
             })
         },
         game_start_button() {
+            if(this.words_x.length === 0) {
+                alert('최소한 하나의 단어는 있어야 합니다.')
+                return
+            }
             this.start_game = true
         },
         game_start_button_start() {
