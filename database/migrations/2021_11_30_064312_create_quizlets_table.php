@@ -21,7 +21,11 @@ class CreateQuizletsTable extends Migration
             $table->string('quiz');
             $table->string('quiz_type');
             $table->bigInteger('timer') -> nullable();
+
+
             $table->foreignId('voca_id')
+                ->constrained();
+            $table->foreignId('room_id')
                 ->constrained()
                 ->onDelete('cascade');
         });

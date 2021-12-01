@@ -21244,6 +21244,7 @@ __webpack_require__.r(__webpack_exports__);
     read_words: function read_words() {
       var _this4 = this;
 
+      console.log('tt');
       axios__WEBPACK_IMPORTED_MODULE_1___default().get('/api/words/' + this.voca_x.id).then(function (response) {
         console.log(response);
 

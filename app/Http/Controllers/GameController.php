@@ -138,17 +138,73 @@ class GameController extends Controller
 
 
 
-
         foreach($quiz as $q) {
-            $n = rand(1,3);
-            $quizlet = new Quizlet();
+            if($q -> kannzi ){
+                $n = rand(1,3);
 
+                $quizlet = new Quizlet();
+                $quizlet->voca_id = $room -> voca_id;
 
-            if($n === 1) {
-                dd('이 컴퓨터는 해킹당했습니다.');
+                if($n == 1) {
+    //                dd('이 컴퓨터는 해킹당했습니다.');
+                    $quizlet -> quiz = $q -> hiragana;
+                    $quizlet -> quiz_type = 'hiragana';
+                    $k = rand(1,2);
+                    if($k == 1){
+                        $quizlet -> answer = $q -> korean;
+                        $quizlet -> answer_type = 'korean';
+                    }else {
+                        $quizlet -> answer = $q -> kannzi;
+                        $quizlet -> answer_type = 'kannzi';
+                    }
+                }else if($n == 2) {
+                    $quizlet -> quiz = $q -> kannzi;
+                    $quizlet -> quiz_type = 'kannzi';
+                    $k = rand(1,2);
+                    if($k == 1) {
+                        $quizlet -> answer = $q -> korean;
+                        $quizlet -> answer_type = 'korean';
+                    } else {
+                        $quizlet -> answer = $q -> hiragana;
+                        $quizlet -> answer_type = 'hiragana';
+                    }
+                } else {
+                    $quizlet -> quiz = $q -> korean;
+                    $quizlet -> quiz_type = 'korean';
+                    $k = rand(1,2);
+                    if($k == 1) {
+                        $quizlet -> answer = $q -> hiragana;
+                        $quizlet -> answer_type = 'hiragana';
+                    } else {
+                        $quizlet -> answer = $q -> kannzi;
+                        $quizlet -> answer_type = 'kannzi';
+                    }
+                }
+                $quizlet -> room_id = $room -> id;
+                $quizlet -> save();
+            } else {
+                $n = rand(1,2);
+                $quizlet = new Quizlet();
+                $quizlet->voca_id = $room -> voca_id;
+
+                if($n == 1) {
+                    $quizlet -> quiz = $q -> korean;
+                    $quizlet -> quiz_type = 'korean';
+                    $quizlet -> answer = $q -> hiragana;
+                    $quizlet -> answer_type = 'hiragana';
+                } else {
+                    $quizlet -> quiz = $q -> hiragana;
+                    $quizlet -> quiz_type = 'hiragana';
+                    $quizlet -> answer = $q -> korean;
+                    $quizlet -> answer_type = 'korean';
+                }
+
+//                return ['$room_id' => $room_id];
+                $quizlet -> room_id = $room -> id;
+                $quizlet -> save();
             }
-        }
 
+        }
 
         return $n;
     }

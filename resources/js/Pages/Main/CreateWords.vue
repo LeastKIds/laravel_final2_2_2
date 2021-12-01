@@ -345,6 +345,7 @@ export default {
             return REGEX_CHINESE.test(str);
         },
         read_words() {
+            console.log('tt')
             axios.get('/api/words/'+this.voca_x.id)
                 .then(response => {
                     console.log(response)

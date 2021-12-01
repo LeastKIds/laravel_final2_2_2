@@ -12,11 +12,16 @@ class WordController extends Controller
     //
     public function index($voca_id) {
         $id = auth() -> user() -> id;
-        $words = Word::where('voca_id', $voca_id) -> get();
-        if($words[0] -> user_id != $id)
-            return Inertia::render('Error/Error_BadConnection');
+        if (Word::where('voca_id', $voca_id) -> exists()) {
+            $words = Word::where('voca_id', $voca_id) -> get();
+            if($words[0] -> user_id != $id)
+                return Inertia::render('Error/Error_BadConnection');
 
-        return ['success' => 1, 'message' =>'불러오기 성공', 'words' => $words];
+            return ['success' => 1, 'message' =>'불러오기 성공', 'words' => $words];
+        } else {
+            return ['success' => 1, 'message' =>'불러오기 성공', 'words' => []];
+        }
+
     }
 
 
