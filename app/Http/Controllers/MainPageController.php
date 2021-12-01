@@ -9,6 +9,7 @@ use App\Models\Voca;
 use App\Models\Word;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 
 class MainPageController extends Controller
@@ -78,5 +79,32 @@ class MainPageController extends Controller
 
 
         return Inertia::render('Main/GameRoom', ['users' => $users, 'room'=>$room]);
+    }
+
+    public function index_game_list() {
+
+        if(RoomMessage::where('user_id', auth() -> user() -> id) -> exists()) {
+            $room_message = RoomMessage::where('user_id', auth() -> user() -> id) -> first();
+            $room_id = $room_message -> room_id;
+            $url = '/game/'.$room_id;
+            return redirect($url);
+        }
+
+        $rooms = Room::with('room_messages') -> latest() -> paginate(12);
+        return Inertia::render('Main/GameRoomSelect', ['rooms' => $rooms]);
+    }
+
+    public function index_game_enter($room_id) {
+        if(RoomMessage::where('room_id', $room_id) -> doesntExist()) {
+            return Inertia::render('Error/Error_BadConnection');
+        }
+
+        $room_message = RoomMessage::where('room_id', $room_id) -> get();
+        $room_member = $room_message -> count();
+        if($room_member > 4) {
+
+        }
+
+        return ['success' => 1, 'room_message' => $room_message -> count()];
     }
 }

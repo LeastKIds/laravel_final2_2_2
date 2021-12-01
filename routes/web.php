@@ -52,7 +52,12 @@ Route::middleware(['auth:sanctum', 'verified'])->
 
 Route::middleware(['auth:sanctum', 'verified'])->
 prefix('game') -> group(function () {
+    Route::get('/list', [MainPageController::class, 'index_game_list']);
+
     Route::get('/{room_id}', [MainPageController::class, 'index_game']);
+
+//    Route::get('/{room_id}', [MainPageController::class, 'index_game_enter']);
+
 
 });
 
@@ -89,9 +94,16 @@ Route::middleware(['auth:sanctum', 'verified'])->
         });
 
         Route::prefix('game') -> group(function () {
+            Route::get('/', [GameController::class, 'index']);
             Route::post('/store', [GameController::class, 'store']);
            Route::post('/messages/{room_id}', [GameController::class, 'send_messages']);
            Route::get('/member/{room_id}', [GameController::class, 'member']);
+           Route::get('/timer', [GameController::class, 'timer']);
+           Route::post('/start/{room_id}', [GameController::class, 'game_start']);
            Route::delete('/delete/{room_id}', [GameController::class, 'destroy']);
+           Route::get('/{room_id}', [GameController::class, 'index']);
+
+           Route::post('/member/{room_id}', [GameController::class, 'member_check']);
+
         });
     });

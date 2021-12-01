@@ -27,7 +27,7 @@
                     </li>
                     <li class="mr-3" >
                         <a class="inline-block hover:text-yellow-300
-                        hover:text-underline py-2 px-4" id="online" href="#">참가참가</a>
+                        hover:text-underline py-2 px-4" id="online" href="/game/list">참가참가</a>
                     </li>
                     <li class="mr-3" >
                         <a class="inline-block hover:text-yellow-300 hover:text-underline

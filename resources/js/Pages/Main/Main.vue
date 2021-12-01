@@ -39,7 +39,7 @@
                                  style="right: 50%; border: 2px solid #FFC100; border-radius: 1%;"></div>
                             <div class="border-2-2 border-yellow-555 absolute h-full border"
                                  style="left: 50%; border: 2px solid #FFC100; border-radius: 1%;"></div>
-                            <div class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline">
+                            <Link class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline" href="/game/list">
                                 <div class="order-1 w-5/12"></div>
                                 <div class="order-1 w-5/12 px-1 py-4 text-right">
                                     <p class="mb-3 text-base text-yellow-300">온라인</p>
@@ -48,7 +48,7 @@
                                         온라인으로 친구들과 함께하세요!
                                     </p>
                                 </div>
-                            </div>
+                            </Link>
                             <Link class="mb-8 flex justify-between items-center w-full right-timeline" href="/vocabulary">
                                 <div class="order-1 w-5/12"></div>
                                 <div class="order-1  w-5/12 px-1 py-4 text-left">

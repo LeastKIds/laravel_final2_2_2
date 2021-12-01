@@ -45,13 +45,13 @@
     <section>
         <div class="bg-black text-white py-20 h-screen ">
             <div class="container mx-auto flex flex-col md:flex-row my-6 md:my-24">
-                <div class="flex flex-col w-full lg:w-1/3 p-8">
+                <Link class="flex flex-col w-full lg:w-1/3 p-8" href="/">
                     <p class="ml-6 text-yellow-300 text-lg uppercase tracking-loose">일본어 단어장</p>
                     <p class="text-3xl md:text-5xl my-4 leading-relaxed md:leading-snug">일본어 퀴즈 단어장!</p>
                     <p class="text-sm md:text-base leading-snug text-gray-50 text-opacity-100">
                         단어장을 작성하고, 친구들과 퀴즈를 푸세요.
                     </p>
-                </div>
+                </Link>
                 <div class="flex flex-col w-full lg:w-2/3 justify-center">
                     <div class="container w-full px-4">
                         <div class="flex flex-wrap justify-center">

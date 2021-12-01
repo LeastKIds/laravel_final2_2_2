@@ -18,6 +18,7 @@ class CreateRoomsTable extends Migration
             $table->timestamps();
             $table -> string('name');
             $table -> string('admin');
+            $table->foreignId('voca_id')->constrained();
         });
     }
 

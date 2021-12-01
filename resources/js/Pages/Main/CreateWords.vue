@@ -432,7 +432,9 @@ export default {
                 return
             }
 
-            axios.post('/api/game/store', {'name' : this.game.title})
+            console.log(this.voca_x.id)
+
+            axios.post('/api/game/store', {'name' : this.game.title, 'voca_id' : this.voca_x.id})
                 .then(response => {
                     console.log(response)
                     if(response.data.success === 1)

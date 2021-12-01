@@ -16,7 +16,7 @@
                             <div class="inline-flex">
                                 <button class="px-4 py-2 rounded-md text-sm font-medium border focus:outline-none focus:ring transition
                              text-green-600 border-green-600 hover:text-white hover:bg-green-600 active:bg-green-700
-                             focus:ring-green-300 inline-flex m-2" type="submit">시작</button>
+                             focus:ring-green-300 inline-flex m-2" type="submit" @click="game_start">시작</button>
                                 <button class="px-4 py-2 rounded-md text-sm font-medium border
                             focus:outline-none focus:ring transition text-red-600 border-red-600
                             hover:text-white hover:bg-red-600 active:bg-red-700 focus:ring-red-300
@@ -101,14 +101,19 @@ export default {
         }
     },
     mounted() {
-            this.players = this.users
-            this.player_list()
+
+
         }
     ,
     created() {
         this.room_info = this.room
         // console.log('room.'+this.room_info.id)
-        // console.log(this.room_info)
+        // console.log(this.room_info
+
+        this.member_check()
+        this.players = this.users
+        this.player_list()
+
         let vm = this
         window.Echo.private('room.'+this.room_info.id)
             .listen('MessageSent', e => {
@@ -139,15 +144,6 @@ export default {
             return false
         },
         sendMessage(index) {
-            // clearTimeout(this.chat_time_check.n1)
-            // this.chat_log.n1 = this.chat_input_log.n1
-            // this.chat_input_log.n1 = ''
-            // // console.log(this.chat_log.n1)
-            // this.chat = true
-            // const vm =this
-            // this.chat_time_check.n1 = setTimeout(function() {
-            //     vm.chat=false
-            // }, 3000)
             this.chat_log[index] = this.chat_input_log[index]
             this.chat_input_log[index] = ''
             axios.post('/api/game/messages/' + this.room_info.id, {'message' : this.chat_log[index]})
@@ -192,6 +188,49 @@ export default {
                 }).catch(err => {
                     console.log(err)
             })
+        },
+        member_check() {
+            axios.post('/api/game/member/' + this.room_info.id)
+                .then(response => {
+                    console.log(response)
+                    if(response.data.success === 0) {
+                        alert('인원초과!')
+                        window.history.back()
+                    }
+                }).catch(err => {
+                    console.log(err)
+            })
+        },
+        game_start() {
+            axios.post('/api/game/start/' + this.room_info.id)
+                .then(response => {
+                    console.log(response)
+                }).catch(err => {
+                    console.log(err)
+            })
+        },
+
+
+
+        timer () {
+
+            axios.get('/api/game/timer')
+                .then(response => {
+                    console.log(response.data)
+                    console.log(parseInt(Date.now()/1000))
+                }).catch(err => {
+                    console.log(err)
+            })
+
+
+            // let i = 5
+            // let timerId = setInterval(function () {
+            //     console.log(i)
+            //     i = i-1
+            //
+            //     if(i===0)
+            //         clearInterval(timerId);
+            // }, 1000)
         }
     },
 }
