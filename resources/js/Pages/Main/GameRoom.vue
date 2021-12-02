@@ -7,7 +7,9 @@
 
                     <div id="moka-w1wgf" class="items-center justify-center w-full p-8 flex flex-col">
 
-                        <div id="moka-ix3cs" class="bg-gray-400 items-center justify-center md:w-1/2 w-full shadow-md p-5 h-auto rounded-lg blur-3 bg-opacity-50 flex flex-col col-span-12">
+                        <div id="moka-ix3cs" class="bg-gray-400 items-center
+                        justify-center md:w-1/2 w-full shadow-md p-5 h-auto rounded-lg
+                        blur-3 bg-opacity-50 flex flex-col col-span-12" v-if="start===false">
                             <h4 class="w-48 border-t-4 border-solid border-red-500 h-10" id="moka-uuij0">
                             </h4>
                             <h4 class="text-black    text-2xl" id="moka-8q3tt" style="font-family: Abel;">사람들 기다리는 중...</h4>
@@ -22,8 +24,25 @@
                             hover:text-white hover:bg-red-600 active:bg-red-700 focus:ring-red-300
                             inline-flex m-2" type="submit" @click="room_out">나가기</button>
                             </div>
+                        </div>
 
-
+                        <div class="bg-gray-400 items-center
+                        justify-center md:w-1/2 w-full shadow-md p-5 h-auto rounded-lg
+                        blur-3 bg-opacity-50 flex flex-col col-span-12" v-if="start">
+                            <h4 class="w-48 border-t-4 border-solid border-red-500 h-10" >
+                            </h4>
+                            <h4 class="text-black    text-2xl" style="font-family: Abel;">문제문제</h4>
+                            <h2 class="text-black   text-5xl text-center mt-2 mb-10"  style="font-family: &quot;Archivo Black&quot;;">문제문제</h2>
+                            <!--                            <button value="button" class="hover:text-gray-300 bg-yellow-800 text-white hover:bg-black w-56 p-4 text-2xl font-bold" id="moka-8pwrq" style="font-family: Barlow;">시작</button>-->
+                            <div class="inline-flex">
+                                <button class="px-4 py-2 rounded-md text-sm font-medium border focus:outline-none focus:ring transition
+                             text-green-600 border-green-600 hover:text-white hover:bg-green-600 active:bg-green-700
+                             focus:ring-green-300 inline-flex m-2" type="submit" @click="game_start">1/4 넘기기</button>
+                                <button class="px-4 py-2 rounded-md text-sm font-medium border
+                            focus:outline-none focus:ring transition text-red-600 border-red-600
+                            hover:text-white hover:bg-red-600 active:bg-red-700 focus:ring-red-300
+                            inline-flex m-2" type="submit" @click="room_out">나가기</button>
+                            </div>
                         </div>
                     </div>
 
@@ -98,6 +117,8 @@ export default {
             chat_log : ['','','',''],
             chat_input_log : ['','','',''],
             chat_time_check : ['','','',''],
+            start : false,
+
         }
     },
     mounted() {
@@ -108,7 +129,9 @@ export default {
     created() {
         this.room_info = this.room
         // console.log('room.'+this.room_info.id)
-        // console.log(this.room_info
+        console.log(this.room_info)
+        if(this.room_info.start === 1)
+            this.start===true
 
         this.member_check()
         this.players = this.users
@@ -205,9 +228,19 @@ export default {
             axios.post('/api/game/start/' + this.room_info.id)
                 .then(response => {
                     console.log(response)
+                    if(response.data.success === 1) {
+                        this.start=true
+
+
+
+
+                    }
                 }).catch(err => {
                     console.log(err)
             })
+        },
+        quiz() {
+            
         },
 
 

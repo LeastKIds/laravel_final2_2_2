@@ -135,7 +135,8 @@ class GameController extends Controller
             return ['success'=> 0, 'message' => '방장이 아니야!'];
 
         $quiz = Word::where('voca_id',$room -> voca_id) -> inRandomOrder()->get();
-
+        $room -> start = 1;
+        $room -> save();
 
 
         foreach($quiz as $q) {
@@ -206,6 +207,6 @@ class GameController extends Controller
 
         }
 
-        return $n;
+        return ['success' => 1, 'message' =>'성공'];
     }
 }

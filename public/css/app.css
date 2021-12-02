@@ -3222,6 +3222,9 @@ html {
 .h-20 {
 	height: 5rem;
 }
+.h-full {
+	height: 100%;
+}
 .h-screen {
 	height: 100vh;
 }
@@ -3233,12 +3236,6 @@ html {
 }
 .h-36 {
 	height: 9rem;
-}
-.h-full {
-	height: 100%;
-}
-.max-h-full {
-	max-height: 100%;
 }
 .min-h-screen {
 	min-height: 100vh;
@@ -3564,6 +3561,10 @@ html {
 	--tw-border-opacity: 1;
 	border-color: rgba(37, 99, 235, var(--tw-border-opacity));
 }
+.border-red-600 {
+	--tw-border-opacity: 1;
+	border-color: rgba(220, 38, 38, var(--tw-border-opacity));
+}
 .border-yellow-600 {
 	--tw-border-opacity: 1;
 	border-color: rgba(217, 119, 6, var(--tw-border-opacity));
@@ -3603,10 +3604,6 @@ html {
 .border-green-600 {
 	--tw-border-opacity: 1;
 	border-color: rgba(5, 150, 105, var(--tw-border-opacity));
-}
-.border-red-600 {
-	--tw-border-opacity: 1;
-	border-color: rgba(220, 38, 38, var(--tw-border-opacity));
 }
 .bg-white {
 	--tw-bg-opacity: 1;
@@ -4430,6 +4427,10 @@ html {
 	--tw-ring-opacity: 1;
 	--tw-ring-color: rgba(147, 197, 253, var(--tw-ring-opacity));
 }
+.focus\:ring-red-300:focus {
+	--tw-ring-opacity: 1;
+	--tw-ring-color: rgba(252, 165, 165, var(--tw-ring-opacity));
+}
 .focus\:ring-yellow-300:focus {
 	--tw-ring-opacity: 1;
 	--tw-ring-color: rgba(252, 211, 77, var(--tw-ring-opacity));
@@ -4437,10 +4438,6 @@ html {
 .focus\:ring-green-300:focus {
 	--tw-ring-opacity: 1;
 	--tw-ring-color: rgba(110, 231, 183, var(--tw-ring-opacity));
-}
-.focus\:ring-red-300:focus {
-	--tw-ring-opacity: 1;
-	--tw-ring-color: rgba(252, 165, 165, var(--tw-ring-opacity));
 }
 .focus\:ring-opacity-50:focus {
 	--tw-ring-opacity: 0.5;
@@ -4473,6 +4470,10 @@ html {
 	--tw-bg-opacity: 1;
 	background-color: rgba(29, 78, 216, var(--tw-bg-opacity));
 }
+.active\:bg-red-700:active {
+	--tw-bg-opacity: 1;
+	background-color: rgba(185, 28, 28, var(--tw-bg-opacity));
+}
 .active\:bg-yellow-700:active {
 	--tw-bg-opacity: 1;
 	background-color: rgba(180, 83, 9, var(--tw-bg-opacity));
@@ -4480,10 +4481,6 @@ html {
 .active\:bg-green-700:active {
 	--tw-bg-opacity: 1;
 	background-color: rgba(4, 120, 87, var(--tw-bg-opacity));
-}
-.active\:bg-red-700:active {
-	--tw-bg-opacity: 1;
-	background-color: rgba(185, 28, 28, var(--tw-bg-opacity));
 }
 .active\:text-gray-700:active {
 	--tw-text-opacity: 1;

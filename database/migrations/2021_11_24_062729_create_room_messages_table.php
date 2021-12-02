@@ -21,6 +21,7 @@ class CreateRoomMessagesTable extends Migration
             $table->foreignId('room_id')
                 ->constrained()
                 ->onDelete('cascade');
+            $table->bigInteger('point') -> default(0);
         });
     }
 

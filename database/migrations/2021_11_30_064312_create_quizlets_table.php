@@ -21,6 +21,7 @@ class CreateQuizletsTable extends Migration
             $table->string('quiz');
             $table->string('quiz_type');
             $table->bigInteger('timer') -> nullable();
+            $table->bigInteger('pass') -> default(0);
 
 
             $table->foreignId('voca_id')
