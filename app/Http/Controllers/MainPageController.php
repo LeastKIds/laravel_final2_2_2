@@ -75,7 +75,7 @@ class MainPageController extends Controller
 
 
         $users = RoomMessage::where('room_id', $room_id) -> with('user') -> get();
-        MessageSent::dispatch($users, $room_id, 0);
+        MessageSent::dispatch($users, $room_id, 0, $room);
 
 
         return Inertia::render('Main/GameRoom', ['users' => $users, 'room'=>$room]);

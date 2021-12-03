@@ -20,6 +20,7 @@ class CreateRoomsTable extends Migration
             $table -> string('admin');
             $table->foreignId('voca_id')->constrained();
             $table->bigInteger('start') -> default(0);
+            $table->integer('quiz_number') -> default(0);
         });
     }
 

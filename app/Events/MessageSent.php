@@ -18,18 +18,20 @@ class MessageSent implements ShouldBroadcast
     public $room_messages;
     public $room_id;
     public $check;
+    public $room;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($room_messages, $room_id, $check)
+    public function __construct($room_messages, $room_id, $check, $room)
     {
         //
         $this->room_messages = $room_messages;
         $this->room_id = $room_id;
         $this->check = $check;
+        $this->room = $room;
     }
 
     /**

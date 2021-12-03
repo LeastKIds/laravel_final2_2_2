@@ -78,7 +78,9 @@ class GameController extends Controller
 //        $room_messages = RoomMessage::find(1);
 //        $abc = RoomMessage::find(1);
 //        broadcast(new MessageSent($room_message, $request->message)) -> toOthers();
-        MessageSent::dispatch($room_messages, $room_id, 1);
+
+        $room = Room::find($room_id);
+        MessageSent::dispatch($room_messages, $room_id, 1, $room);
         $room_message -> message = null;
         $room_message -> save();
 
@@ -93,6 +95,7 @@ class GameController extends Controller
 
     public function destroy($room_id) {
 
+
         if(RoomMessage::where('user_id',auth() -> user() -> id)
             -> where('room_id',$room_id) -> doesntExist())
             return ['success' => 0, 'message' =>'잘못된 접근'];
@@ -101,12 +104,13 @@ class GameController extends Controller
             -> where('room_id',$room_id) -> first();
         $room_message -> delete();
 
+
         $room = Room::find($room_id);
         if($room -> admin == auth() -> user() -> id) {
             $room -> delete();
-            MessageSent::dispatch('', $room_id, 3);
+            MessageSent::dispatch('', $room_id, 3, '');
         } else{
-            MessageSent::dispatch('', $room_id, 0);
+            MessageSent::dispatch('', $room_id, 0, $room);
         }
 
 
@@ -149,36 +153,36 @@ class GameController extends Controller
                 if($n == 1) {
     //                dd('이 컴퓨터는 해킹당했습니다.');
                     $quizlet -> quiz = $q -> hiragana;
-                    $quizlet -> quiz_type = 'hiragana';
+                    $quizlet -> quiz_type = '히라가나';
                     $k = rand(1,2);
                     if($k == 1){
                         $quizlet -> answer = $q -> korean;
-                        $quizlet -> answer_type = 'korean';
+                        $quizlet -> answer_type = '한국어';
                     }else {
                         $quizlet -> answer = $q -> kannzi;
-                        $quizlet -> answer_type = 'kannzi';
+                        $quizlet -> answer_type = '한자';
                     }
                 }else if($n == 2) {
                     $quizlet -> quiz = $q -> kannzi;
-                    $quizlet -> quiz_type = 'kannzi';
+                    $quizlet -> quiz_type = '한자';
                     $k = rand(1,2);
                     if($k == 1) {
                         $quizlet -> answer = $q -> korean;
-                        $quizlet -> answer_type = 'korean';
+                        $quizlet -> answer_type = '한국어';
                     } else {
                         $quizlet -> answer = $q -> hiragana;
-                        $quizlet -> answer_type = 'hiragana';
+                        $quizlet -> answer_type = '히라가나';
                     }
                 } else {
                     $quizlet -> quiz = $q -> korean;
-                    $quizlet -> quiz_type = 'korean';
+                    $quizlet -> quiz_type = '한국어';
                     $k = rand(1,2);
                     if($k == 1) {
                         $quizlet -> answer = $q -> hiragana;
-                        $quizlet -> answer_type = 'hiragana';
+                        $quizlet -> answer_type = '히라가나';
                     } else {
                         $quizlet -> answer = $q -> kannzi;
-                        $quizlet -> answer_type = 'kannzi';
+                        $quizlet -> answer_type = '한자';
                     }
                 }
                 $quizlet -> room_id = $room -> id;
@@ -190,14 +194,14 @@ class GameController extends Controller
 
                 if($n == 1) {
                     $quizlet -> quiz = $q -> korean;
-                    $quizlet -> quiz_type = 'korean';
+                    $quizlet -> quiz_type = '한국어';
                     $quizlet -> answer = $q -> hiragana;
-                    $quizlet -> answer_type = 'hiragana';
+                    $quizlet -> answer_type = '히라가나';
                 } else {
                     $quizlet -> quiz = $q -> hiragana;
-                    $quizlet -> quiz_type = 'hiragana';
+                    $quizlet -> quiz_type = '히라가나';
                     $quizlet -> answer = $q -> korean;
-                    $quizlet -> answer_type = 'korean';
+                    $quizlet -> answer_type = '한국어';
                 }
 
 //                return ['$room_id' => $room_id];
@@ -207,6 +211,45 @@ class GameController extends Controller
 
         }
 
+        MessageSent::dispatch([], $room_id, 2, $room);
         return ['success' => 1, 'message' =>'성공'];
+    }
+
+    public function select(Request $request) {
+        $quiz_number = $request -> quiz_number;
+        $room_id = $request -> room_id;
+
+        $quiz = Quizlet::where('room_id', $room_id) -> get();
+//        return $room_message;
+        $data = ['answer_type' => $quiz[$quiz_number] -> answer_type,
+            'quiz' => $quiz[$quiz_number] -> quiz];
+//        MessageSent::dispatch($room_message, $room_id, 21);
+        return ['success' => 1, 'message' =>'성공', 'quiz' => $data];
+    }
+
+    public function answer(Request $request) {
+        $room_id = $request -> room_id;
+        $p_answer = $request -> answer;
+
+        $room = Room::find($room_id);
+        $quiz_number = $room -> quiz_number;
+        $quiz = Quizlet::where('room_id', $room_id) -> get();
+        $answer = $quiz[$quiz_number] -> answer;
+
+        if($p_answer == $answer) {
+            if(count($quiz) <= $quiz_number) {
+                return ['success' => 1, 'message' =>'모두 끝났어요!'];
+            }else {
+                $room -> quiz_number = $quiz_number + 1;
+                $room_message = RoomMessage::where('user_id', auth() -> user() -> id) -> first();
+                $room_message -> point = $room_message -> point + 1;
+                $room -> save();
+                $room_message -> save();
+
+                MessageSent::dispatch(auth() -> user(), $room_id, 22, $room);
+                return ['success' => 1];
+            }
+        }
+        return ['success' => 0];
     }
 }

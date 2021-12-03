@@ -18,7 +18,8 @@
                             <div class="inline-flex">
                                 <button class="px-4 py-2 rounded-md text-sm font-medium border focus:outline-none focus:ring transition
                              text-green-600 border-green-600 hover:text-white hover:bg-green-600 active:bg-green-700
-                             focus:ring-green-300 inline-flex m-2" type="submit" @click="game_start">시작</button>
+                             focus:ring-green-300 inline-flex m-2" type="submit"
+                                       v-if="parseInt(room_info.admin) === $page.props.user.id" @click="game_start">시작</button>
                                 <button class="px-4 py-2 rounded-md text-sm font-medium border
                             focus:outline-none focus:ring transition text-red-600 border-red-600
                             hover:text-white hover:bg-red-600 active:bg-red-700 focus:ring-red-300
@@ -31,8 +32,8 @@
                         blur-3 bg-opacity-50 flex flex-col col-span-12" v-if="start">
                             <h4 class="w-48 border-t-4 border-solid border-red-500 h-10" >
                             </h4>
-                            <h4 class="text-black    text-2xl" style="font-family: Abel;">문제문제</h4>
-                            <h2 class="text-black   text-5xl text-center mt-2 mb-10"  style="font-family: &quot;Archivo Black&quot;;">문제문제</h2>
+                            <h4 class="text-black    text-2xl" style="font-family: Abel;">{{quiz_setting.answer_type}}</h4>
+                            <h2 class="text-black   text-5xl text-center mt-2 mb-10"  style="font-family: &quot;Archivo Black&quot;;">{{quiz_setting.q}}</h2>
                             <!--                            <button value="button" class="hover:text-gray-300 bg-yellow-800 text-white hover:bg-black w-56 p-4 text-2xl font-bold" id="moka-8pwrq" style="font-family: Barlow;">시작</button>-->
                             <div class="inline-flex">
                                 <button class="px-4 py-2 rounded-md text-sm font-medium border focus:outline-none focus:ring transition
@@ -119,6 +120,10 @@ export default {
             chat_time_check : ['','','',''],
             start : false,
 
+            quiz_setting : {
+                answer_type : '',
+                q : '',
+            },
         }
     },
     mounted() {
@@ -131,7 +136,18 @@ export default {
         // console.log('room.'+this.room_info.id)
         console.log(this.room_info)
         if(this.room_info.start === 1)
-            this.start===true
+        {
+            this.start=true
+            axios.post('/api/game/select',
+                {'quiz_number' : this.room_info.quiz_number, 'room_id' : this.room_info.id})
+                .then(response => {
+                    // console.log(response)
+                    this.quiz_setting.answer_type = response.data.quiz.answer_type + '로 답하세요!'
+                    this.quiz_setting.q = response.data.quiz.quiz
+                }).catch(err => {
+                console.log(err)
+            })
+        }
 
         this.member_check()
         this.players = this.users
@@ -140,21 +156,53 @@ export default {
         let vm = this
         window.Echo.private('room.'+this.room_info.id)
             .listen('MessageSent', e => {
-                console.log(e)
+                // console.log(e)
 
                 if(e.check === 1) {
+                    vm.room_info = e.room
                     e.room_messages.forEach( function (value, index, array) {
                         if(value.message !== null) {
                             // console.log(index)
                             vm.chatting(index, value.message)
+                            vm.send_answer(value.message, vm)
                         }
 
                     })
                 }else if(e.check===3) {
+                    vm.room_info = e.room
+                    // console.log('check 3')
                     alert('방장이 방을 나갔습니다.')
-                    location.href='/';
+                    location.href='/game/list';
+                }else if(e.check===2) {
+                    vm.room_info = e.room
+                    vm.start=true
+                    axios.post('/api/game/select',
+                        {'quiz_number' : vm.room_info.quiz_number, 'room_id' : vm.room_info.id})
+                    .then(response => {
+                        // console.log(response)
+                        vm.quiz_setting.answer_type = response.data.quiz.answer_type + '로 답하세요!'
+                        vm.quiz_setting.q = response.data.quiz.quiz
+                    }).catch(err => {
+                        console.log(err)
+                    })
+                }else if(e.check===22) {
+                    vm.room_info = e.room
+                    // console.log(e)
+                    vm.players.forEach(function (value, index, array) {
+                        console.log(value)
+                        if(value.user.id === e.room_messages.id) {
+                            vm.quiz_setting.answer_type = '정답자!!'
+                            vm.quiz_setting.q = value.user.name
+
+                            setTimeout(function() {
+                                vm.next_quiz(vm)
+                            },2000)
+
+                        }
+                    })
                 }
                 else{
+                    vm.room_info = e.room
                     vm.player_list()
                 }
 
@@ -171,11 +219,15 @@ export default {
             this.chat_input_log[index] = ''
             axios.post('/api/game/messages/' + this.room_info.id, {'message' : this.chat_log[index]})
                 .then(response => {
-                    console.log(response)
+                    // console.log(response)
 
                 }).catch(err => {
                     console.log(err)
             })
+
+            // this.send_answer(this.chat_log[index]);
+
+
         },
         chatting(index, message) {
             clearTimeout(this.chat_time_check[index])
@@ -190,7 +242,7 @@ export default {
         player_list() {
             axios.get('/api/game/member/'+this.room_info.id)
                 .then(response => {
-                    console.log(response)
+                    // console.log(response)
                     if(response.data.success === 1) {
                         this.players = response.data.users
                     }
@@ -215,7 +267,7 @@ export default {
         member_check() {
             axios.post('/api/game/member/' + this.room_info.id)
                 .then(response => {
-                    console.log(response)
+                    // console.log(response)
                     if(response.data.success === 0) {
                         alert('인원초과!')
                         window.history.back()
@@ -227,20 +279,36 @@ export default {
         game_start() {
             axios.post('/api/game/start/' + this.room_info.id)
                 .then(response => {
-                    console.log(response)
+                    // console.log(response)
                     if(response.data.success === 1) {
                         this.start=true
-
-
-
-
+                    }
+                    else {
+                        alert('당신 방장이 아니잖아!')
                     }
                 }).catch(err => {
                     console.log(err)
             })
         },
-        quiz() {
-            
+        send_answer(value, vm) {
+            axios.post('/api/game/answer',
+                {'room_id' : vm.room_info.id, 'answer' : value})
+            .then(response => {
+                console.log(response)
+            }).catch(err => {
+                console.log(err)
+            })
+        },
+        next_quiz(vm) {
+            axios.post('/api/game/select',
+                {'quiz_number' : vm.room_info.quiz_number, 'room_id' : vm.room_info.id})
+                .then(response => {
+                    // console.log(response)
+                    vm.quiz_setting.answer_type = response.data.quiz.answer_type + '로 답하세요!'
+                    vm.quiz_setting.q = response.data.quiz.quiz
+                }).catch(err => {
+                console.log(err)
+            })
         },
 
 
@@ -249,7 +317,7 @@ export default {
 
             axios.get('/api/game/timer')
                 .then(response => {
-                    console.log(response.data)
+                    // console.log(response.data)
                     console.log(parseInt(Date.now()/1000))
                 }).catch(err => {
                     console.log(err)

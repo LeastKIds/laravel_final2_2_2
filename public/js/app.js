@@ -21375,33 +21375,84 @@ __webpack_require__.r(__webpack_exports__);
       chat_log: ['', '', '', ''],
       chat_input_log: ['', '', '', ''],
       chat_time_check: ['', '', '', ''],
-      start: false
+      start: false,
+      quiz_setting: {
+        answer_type: '',
+        q: ''
+      }
     };
   },
   mounted: function mounted() {},
   created: function created() {
+    var _this = this;
+
     this.room_info = this.room; // console.log('room.'+this.room_info.id)
 
     console.log(this.room_info);
-    if (this.room_info.start === 1) this.start === true;
+
+    if (this.room_info.start === 1) {
+      this.start = true;
+      axios.post('/api/game/select', {
+        'quiz_number': this.room_info.quiz_number,
+        'room_id': this.room_info.id
+      }).then(function (response) {
+        // console.log(response)
+        _this.quiz_setting.answer_type = response.data.quiz.answer_type + '로 답하세요!';
+        _this.quiz_setting.q = response.data.quiz.quiz;
+      })["catch"](function (err) {
+        console.log(err);
+      });
+    }
+
     this.member_check();
     this.players = this.users;
     this.player_list();
     var vm = this;
     window.Echo["private"]('room.' + this.room_info.id).listen('MessageSent', function (e) {
-      console.log(e);
-
+      // console.log(e)
       if (e.check === 1) {
+        vm.room_info = e.room;
         e.room_messages.forEach(function (value, index, array) {
           if (value.message !== null) {
             // console.log(index)
             vm.chatting(index, value.message);
+            vm.send_answer(value.message, vm);
           }
         });
       } else if (e.check === 3) {
+        vm.room_info = e.room; // console.log('check 3')
+
         alert('방장이 방을 나갔습니다.');
-        location.href = '/';
+        location.href = '/game/list';
+      } else if (e.check === 2) {
+        vm.room_info = e.room;
+        vm.start = true;
+        axios.post('/api/game/select', {
+          'quiz_number': vm.room_info.quiz_number,
+          'room_id': vm.room_info.id
+        }).then(function (response) {
+          // console.log(response)
+          vm.quiz_setting.answer_type = response.data.quiz.answer_type + '로 답하세요!';
+          vm.quiz_setting.q = response.data.quiz.quiz;
+        })["catch"](function (err) {
+          console.log(err);
+        });
+      } else if (e.check === 22) {
+        vm.room_info = e.room; // console.log(e)
+
+        vm.players.forEach(function (value, index, array) {
+          console.log(value);
+
+          if (value.user.id === e.room_messages.id) {
+            vm.quiz_setting.answer_type = '정답자!!';
+            vm.quiz_setting.q = value.user.name;
+            setTimeout(function () {
+              vm.next_quiz(vm);
+            }, 2000);
+          }
+        });
       } else {
+        vm.room_info = e.room;
         vm.player_list();
       }
     });
@@ -21416,11 +21467,10 @@ __webpack_require__.r(__webpack_exports__);
       this.chat_input_log[index] = '';
       axios.post('/api/game/messages/' + this.room_info.id, {
         'message': this.chat_log[index]
-      }).then(function (response) {
-        console.log(response);
+      }).then(function (response) {// console.log(response)
       })["catch"](function (err) {
         console.log(err);
-      });
+      }); // this.send_answer(this.chat_log[index]);
     },
     chatting: function chatting(index, message) {
       clearTimeout(this.chat_time_check[index]);
@@ -21433,26 +21483,25 @@ __webpack_require__.r(__webpack_exports__);
       }, 3000);
     },
     player_list: function player_list() {
-      var _this = this;
+      var _this2 = this;
 
       axios.get('/api/game/member/' + this.room_info.id).then(function (response) {
-        console.log(response);
-
+        // console.log(response)
         if (response.data.success === 1) {
-          _this.players = response.data.users;
+          _this2.players = response.data.users;
         }
       })["catch"](function (err) {
         console.log(err);
       });
     },
     room_out: function room_out() {
-      var _this2 = this;
+      var _this3 = this;
 
       axios["delete"]('/api/game/delete/' + this.room_info.id).then(function (response) {
         console.log(response);
 
         if (response.data.success === 1) {
-          window.Echo.leave('room.' + _this2.room_info.id);
+          window.Echo.leave('room.' + _this3.room_info.id);
           location.href = '/';
         } else {
           alert('오류발생. 잠시 후에 다시 시도해 주세요.');
@@ -21463,8 +21512,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     member_check: function member_check() {
       axios.post('/api/game/member/' + this.room_info.id).then(function (response) {
-        console.log(response);
-
+        // console.log(response)
         if (response.data.success === 0) {
           alert('인원초과!');
           window.history.back();
@@ -21474,22 +21522,44 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     game_start: function game_start() {
-      var _this3 = this;
+      var _this4 = this;
 
       axios.post('/api/game/start/' + this.room_info.id).then(function (response) {
-        console.log(response);
-
+        // console.log(response)
         if (response.data.success === 1) {
-          _this3.start = true;
+          _this4.start = true;
+        } else {
+          alert('당신 방장이 아니잖아!');
         }
       })["catch"](function (err) {
         console.log(err);
       });
     },
-    quiz: function quiz() {},
+    send_answer: function send_answer(value, vm) {
+      axios.post('/api/game/answer', {
+        'room_id': vm.room_info.id,
+        'answer': value
+      }).then(function (response) {
+        console.log(response);
+      })["catch"](function (err) {
+        console.log(err);
+      });
+    },
+    next_quiz: function next_quiz(vm) {
+      axios.post('/api/game/select', {
+        'quiz_number': vm.room_info.quiz_number,
+        'room_id': vm.room_info.id
+      }).then(function (response) {
+        // console.log(response)
+        vm.quiz_setting.answer_type = response.data.quiz.answer_type + '로 답하세요!';
+        vm.quiz_setting.q = response.data.quiz.quiz;
+      })["catch"](function (err) {
+        console.log(err);
+      });
+    },
     timer: function timer() {
       axios.get('/api/game/timer').then(function (response) {
-        console.log(response.data);
+        // console.log(response.data)
         console.log(parseInt(Date.now() / 1000));
       })["catch"](function (err) {
         console.log(err);
@@ -27086,28 +27156,18 @@ var _hoisted_12 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_13 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", {
-    "class": "text-black text-2xl",
-    style: {
-      "font-family": "Abel"
-    }
-  }, "문제문제", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_14 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h2", {
-    "class": "text-black text-5xl text-center mt-2 mb-10",
-    style: {
-      "font-family": "\"Archivo Black\""
-    }
-  }, "문제문제", -1
-  /* HOISTED */
-  );
-});
-
+var _hoisted_13 = {
+  "class": "text-black text-2xl",
+  style: {
+    "font-family": "Abel"
+  }
+};
+var _hoisted_14 = {
+  "class": "text-black text-5xl text-center mt-2 mb-10",
+  style: {
+    "font-family": "\"Archivo Black\""
+  }
+};
 var _hoisted_15 = {
   "class": "inline-flex"
 };
@@ -27157,19 +27217,24 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   var _component_layout = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("layout");
 
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_layout), _hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [$data.start === false ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_6, [_hoisted_7, _hoisted_8, _hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <button value=\"button\" class=\"hover:text-gray-300 bg-yellow-800 text-white hover:bg-black w-56 p-4 text-2xl font-bold\" id=\"moka-8pwrq\" style=\"font-family: Barlow;\">시작</button>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_layout), _hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [$data.start === false ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_6, [_hoisted_7, _hoisted_8, _hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <button value=\"button\" class=\"hover:text-gray-300 bg-yellow-800 text-white hover:bg-black w-56 p-4 text-2xl font-bold\" id=\"moka-8pwrq\" style=\"font-family: Barlow;\">시작</button>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [parseInt($data.room_info.admin) === _ctx.$page.props.user.id ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    key: 0,
     "class": "px-4 py-2 rounded-md text-sm font-medium border focus:outline-none focus:ring transition text-green-600 border-green-600 hover:text-white hover:bg-green-600 active:bg-green-700 focus:ring-green-300 inline-flex m-2",
     type: "submit",
     onClick: _cache[0] || (_cache[0] = function () {
       return $options.game_start && $options.game_start.apply($options, arguments);
     })
-  }, "시작"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, "시작")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "px-4 py-2 rounded-md text-sm font-medium border focus:outline-none focus:ring transition text-red-600 border-red-600 hover:text-white hover:bg-red-600 active:bg-red-700 focus:ring-red-300 inline-flex m-2",
     type: "submit",
     onClick: _cache[1] || (_cache[1] = function () {
       return $options.room_out && $options.room_out.apply($options, arguments);
     })
-  }, "나가기")])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.start ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_11, [_hoisted_12, _hoisted_13, _hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <button value=\"button\" class=\"hover:text-gray-300 bg-yellow-800 text-white hover:bg-black w-56 p-4 text-2xl font-bold\" id=\"moka-8pwrq\" style=\"font-family: Barlow;\">시작</button>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, "나가기")])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.start ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_11, [_hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", _hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.quiz_setting.answer_type), 1
+  /* TEXT */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h2", _hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.quiz_setting.q), 1
+  /* TEXT */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <button value=\"button\" class=\"hover:text-gray-300 bg-yellow-800 text-white hover:bg-black w-56 p-4 text-2xl font-bold\" id=\"moka-8pwrq\" style=\"font-family: Barlow;\">시작</button>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "px-4 py-2 rounded-md text-sm font-medium border focus:outline-none focus:ring transition text-green-600 border-green-600 hover:text-white hover:bg-green-600 active:bg-green-700 focus:ring-green-300 inline-flex m-2",
     type: "submit",
     onClick: _cache[2] || (_cache[2] = function () {
