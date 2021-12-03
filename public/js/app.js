@@ -21441,13 +21441,27 @@ __webpack_require__.r(__webpack_exports__);
         vm.room_info = e.room; // console.log(e)
 
         vm.players.forEach(function (value, index, array) {
-          console.log(value);
-
-          if (value.user.id === e.room_messages.id) {
+          // console.log(value)
+          if (value.user.id === e.room_messages) {
             vm.quiz_setting.answer_type = '정답자!!';
             vm.quiz_setting.q = value.user.name;
             setTimeout(function () {
               vm.next_quiz(vm);
+            }, 2000);
+          }
+        });
+      } else if (e.check === 23) {
+        // console.log(e)
+        vm.players.forEach(function (value, index, array) {
+          console.log(value);
+          console.log(e.room_messages);
+
+          if (value.user.id === e.room_messages) {
+            vm.quiz_setting.answer_type = '정답자!!';
+            vm.quiz_setting.q = value.user.name;
+            setTimeout(function () {
+              vm.quiz_setting.answer_type = '우승자!!!';
+              vm.quiz_setting.q = value.user.name;
             }, 2000);
           }
         });

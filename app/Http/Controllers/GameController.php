@@ -235,9 +235,18 @@ class GameController extends Controller
         $quiz_number = $room -> quiz_number;
         $quiz = Quizlet::where('room_id', $room_id) -> get();
         $answer = $quiz[$quiz_number] -> answer;
-
         if($p_answer == $answer) {
-            if(count($quiz) <= $quiz_number) {
+            if(count($quiz) <= $quiz_number+1) {
+
+                $room_message = RoomMessage::where('room_id',$room_id) -> orderBy('point') -> first();
+                $room -> start = 0;
+                $room -> quiz_number = 0;
+                $room -> save();
+
+                foreach($quiz as $q) {
+                    $q -> delete();
+                }
+                MessageSent::dispatch($room_message -> user_id, $room_id, 23, $room);
                 return ['success' => 1, 'message' =>'모두 끝났어요!'];
             }else {
                 $room -> quiz_number = $quiz_number + 1;
