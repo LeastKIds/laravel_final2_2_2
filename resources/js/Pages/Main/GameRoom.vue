@@ -38,7 +38,8 @@
                             <div class="inline-flex">
                                 <button class="px-4 py-2 rounded-md text-sm font-medium border focus:outline-none focus:ring transition
                              text-green-600 border-green-600 hover:text-white hover:bg-green-600 active:bg-green-700
-                             focus:ring-green-300 inline-flex m-2" type="submit" @click="game_start">1/4 넘기기</button>
+                             focus:ring-green-300 inline-flex m-2" v-if="pass"
+                                        type="submit" @click="game_start">{{timer}}</button>
                                 <button class="px-4 py-2 rounded-md text-sm font-medium border
                             focus:outline-none focus:ring transition text-red-600 border-red-600
                             hover:text-white hover:bg-red-600 active:bg-red-700 focus:ring-red-300
@@ -102,6 +103,7 @@
 
 <script>
 import Layout from './../Layouts/Layout.vue';
+import Swal from 'sweetalert2'
 
 export default {
     name: "GameRoom",
@@ -124,6 +126,10 @@ export default {
                 answer_type : '',
                 q : '',
             },
+            pass : true,
+            timer_setting : '',
+            timer : 0,
+
         }
     },
     mounted() {
@@ -134,16 +140,30 @@ export default {
     created() {
         this.room_info = this.room
         // console.log('room.'+this.room_info.id)
-        console.log(this.room_info)
+        // console.log(this.room_info)
         if(this.room_info.start === 1)
         {
             this.start=true
-            axios.post('/api/game/select',
+            axios.post('/api/game/select_second',
                 {'quiz_number' : this.room_info.quiz_number, 'room_id' : this.room_info.id})
                 .then(response => {
                     // console.log(response)
                     this.quiz_setting.answer_type = response.data.quiz.answer_type + '로 답하세요!'
                     this.quiz_setting.q = response.data.quiz.quiz
+                    this.timer = response.data.quiz.timer
+                    console.log(this.timer)
+                    this.timer = this.timer + 5 - parseInt(Date.now()/1000)
+                    console.log(this.timer)
+                    if(this.timer <=0)
+                        this.timer = 0
+                    const vm = this
+                    this.timer_setting = setInterval( function () {
+                        if(vm.timer <=0) {
+                            vm.timer = 0
+                            clearInterval(vm.timer_setting)
+                        }else
+                            vm.timer = vm.timer -1
+                    }, 1000)
                 }).catch(err => {
                 console.log(err)
             })
@@ -174,48 +194,59 @@ export default {
                     alert('방장이 방을 나갔습니다.')
                     location.href='/game/list';
                 }else if(e.check===2) {
+
                     vm.room_info = e.room
                     vm.start=true
                     axios.post('/api/game/select',
                         {'quiz_number' : vm.room_info.quiz_number, 'room_id' : vm.room_info.id})
                     .then(response => {
-                        // console.log(response)
                         vm.quiz_setting.answer_type = response.data.quiz.answer_type + '로 답하세요!'
                         vm.quiz_setting.q = response.data.quiz.quiz
+                        vm.timer = response.data.quiz.timer
+                        vm.timer = vm.timer + 5 - parseInt(Date.now()/1000)
+
+                        vm.timer_setting = setInterval( function () {
+                            if(vm.timer <=0) {
+                                vm.timer = 0
+                                clearInterval(vm.timer_setting)
+                            } else
+                                vm.timer = vm.timer -1
+                        }, 1000)
+
                     }).catch(err => {
                         console.log(err)
                     })
                 }else if(e.check===22) {
+                    clearInterval(vm.timer_setting)
                     vm.room_info = e.room
                     // console.log(e)
-                    vm.players.forEach(function (value, index, array) {
-                        // console.log(value)
-                        if(value.user.id === e.room_messages) {
-                            vm.quiz_setting.answer_type = '정답자!!'
-                            vm.quiz_setting.q = value.user.name
+                    vm.pass=false
+                    vm.quiz_setting.answer_type = '정답자!!'
+                    vm.quiz_setting.q = e.room_messages.user.name
+                    // console.log(e.room_messages.answer)
+                    const answer = e.room_messages.answer
+                    // console.log(name)
+                    vm.answer_message(vm,  answer, vm.quiz_setting.q)
+                    setTimeout(function() {
+                        vm.next_quiz(vm)
+                    },2050)
 
-                            setTimeout(function() {
-                                vm.next_quiz(vm)
-                            },2000)
-
-                        }
-                    })
                 }else if(e.check===23) {
-                    // console.log(e)
-                    vm.players.forEach(function (value, index, array) {
-                        console.log(value)
-                        console.log(e.room_messages)
-                        if(value.user.id === e.room_messages) {
-                            vm.quiz_setting.answer_type = '정답자!!'
-                            vm.quiz_setting.q = value.user.name
-                            setTimeout(function() {
-                                vm.quiz_setting.answer_type = '우승자!!!'
-                                vm.quiz_setting.q = value.user.name
-                            },2000)
+                    console.log(e)
+                    clearInterval(vm.timer_setting)
+                    vm.quiz_setting.answer_type = '정답자!!'
+                    vm.quiz_setting.q = e.room_messages.user.name
+                    const answer = e.room_messages.answer
+                    vm.answer_message(vm,  answer, vm.quiz_setting.q)
+                    setTimeout(function() {
+                        vm.quiz_setting.answer_type = '우승자!!!'
+                        vm.quiz_setting.q = e.room_messages.winner.user.name
+                        setTimeout(function() {
+                            vm.start=false
+                            vm.pass=true
+                        },5000)
+                    },2050)
 
-
-                        }
-                    })
                 }
                 else{
                     vm.room_info = e.room
@@ -226,10 +257,6 @@ export default {
             })
     },
     methods: {
-        chatClick() {
-            console.log('まさか')
-            return false
-        },
         sendMessage(index) {
             this.chat_log[index] = this.chat_input_log[index]
             this.chat_input_log[index] = ''
@@ -310,7 +337,7 @@ export default {
             axios.post('/api/game/answer',
                 {'room_id' : vm.room_info.id, 'answer' : value})
             .then(response => {
-                console.log(response)
+                // console.log(response)
             }).catch(err => {
                 console.log(err)
             })
@@ -322,33 +349,74 @@ export default {
                     // console.log(response)
                     vm.quiz_setting.answer_type = response.data.quiz.answer_type + '로 답하세요!'
                     vm.quiz_setting.q = response.data.quiz.quiz
+                    vm.pass=true
+                    vm.timer = response.data.quiz.timer
+                    console.log(vm.timer)
+                    vm.timer = vm.timer + 5 - parseInt(Date.now()/1000)
+
+                    vm.timer_setting = setInterval( function () {
+                        if(vm.timer <=0) {
+                            vm.timer = 0
+                            clearInterval(vm.timer_setting)
+                        } else
+                            vm.timer = vm.timer -1
+                    }, 1000)
                 }).catch(err => {
                 console.log(err)
             })
         },
-
-
-
-        timer () {
-
-            axios.get('/api/game/timer')
-                .then(response => {
-                    // console.log(response.data)
-                    console.log(parseInt(Date.now()/1000))
-                }).catch(err => {
-                    console.log(err)
+        answer_message(vm, answer, user) {
+            console.log(answer)
+            let timerInterval
+            Swal.fire({
+                title: '정답자 : ' + user,
+                html: '정답 : ' + answer,
+                timer: 2000,
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading()
+                    const b = Swal.getHtmlContainer().querySelector('b')
+                    timerInterval = setInterval(() => {
+                        // b.textContent = Swal.getTimerLeft()
+                    }, 100)
+                },
+                willClose: () => {
+                    clearInterval(timerInterval)
+                    // vm.next_quiz(vm)
+                }
+            }).then((result) => {
+                /* Read more about handling dismissals below */
+                // if (result.dismiss === Swal.DismissReason.timer) {
+                //     console.log('I was closed by the timer')
+                // }
             })
-
-
-            // let i = 5
-            // let timerId = setInterval(function () {
-            //     console.log(i)
-            //     i = i-1
-            //
-            //     if(i===0)
-            //         clearInterval(timerId);
-            // }, 1000)
+        },
+        wrong_message(vm, answer, user) {
+            let timerInterval
+            Swal.fire({
+                title: '정답자 : ' + user,
+                html: '정답 : ' + answer,
+                timer: 2000,
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading()
+                    const b = Swal.getHtmlContainer().querySelector('b')
+                    timerInterval = setInterval(() => {
+                        // b.textContent = Swal.getTimerLeft()
+                    }, 100)
+                },
+                willClose: () => {
+                    clearInterval(timerInterval)
+                    // vm.next_quiz(vm)
+                }
+            }).then((result) => {
+                /* Read more about handling dismissals below */
+                // if (result.dismiss === Swal.DismissReason.timer) {
+                //     console.log('I was closed by the timer')
+                // }
+            })
         }
+
     },
 }
 </script>

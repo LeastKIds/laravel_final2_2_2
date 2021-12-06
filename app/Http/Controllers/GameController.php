@@ -221,8 +221,22 @@ class GameController extends Controller
 
         $quiz = Quizlet::where('room_id', $room_id) -> get();
 //        return $room_message;
+        $quiz[$quiz_number] -> timer = time();
+        $quiz[$quiz_number] -> save();
         $data = ['answer_type' => $quiz[$quiz_number] -> answer_type,
-            'quiz' => $quiz[$quiz_number] -> quiz];
+            'quiz' => $quiz[$quiz_number] -> quiz, 'timer' => $quiz[$quiz_number] -> timer];
+//        MessageSent::dispatch($room_message, $room_id, 21);
+        return ['success' => 1, 'message' =>'성공', 'quiz' => $data];
+    }
+
+    public function select_second(Request $request) {
+        $quiz_number = $request -> quiz_number;
+        $room_id = $request -> room_id;
+
+        $quiz = Quizlet::where('room_id', $room_id) -> get();
+//        return $room_message;
+        $data = ['answer_type' => $quiz[$quiz_number] -> answer_type,
+            'quiz' => $quiz[$quiz_number] -> quiz, 'timer' => $quiz[$quiz_number] -> timer];
 //        MessageSent::dispatch($room_message, $room_id, 21);
         return ['success' => 1, 'message' =>'성공', 'quiz' => $data];
     }
@@ -238,7 +252,8 @@ class GameController extends Controller
         if($p_answer == $answer) {
             if(count($quiz) <= $quiz_number+1) {
 
-                $room_message = RoomMessage::where('room_id',$room_id) -> orderBy('point') -> first();
+                $room_message = RoomMessage::where('room_id',$room_id) ->
+                    with('user')-> orderBy('point','desc') -> first();
                 $room -> start = 0;
                 $room -> quiz_number = 0;
                 $room -> save();
@@ -246,16 +261,18 @@ class GameController extends Controller
                 foreach($quiz as $q) {
                     $q -> delete();
                 }
-                MessageSent::dispatch($room_message -> user_id, $room_id, 23, $room);
+                MessageSent::dispatch(['winner' => $room_message,
+                    'user' => auth() -> user(), 'answer' => $answer], $room_id, 23, $room);
                 return ['success' => 1, 'message' =>'모두 끝났어요!'];
-            }else {
+            }else if(count($quiz) > $quiz_number+1) {
+
                 $room -> quiz_number = $quiz_number + 1;
-                $room_message = RoomMessage::where('user_id', auth() -> user() -> id) -> first();
+                $room_message = RoomMessage::where('user_id', auth() -> user() -> id) ->
+                    with('user') -> first();
                 $room_message -> point = $room_message -> point + 1;
                 $room -> save();
                 $room_message -> save();
-
-                MessageSent::dispatch(auth() -> user(), $room_id, 22, $room);
+                MessageSent::dispatch(['user' => auth() -> user(), 'answer' => $answer], $room_id, 22, $room);
                 return ['success' => 1];
             }
         }

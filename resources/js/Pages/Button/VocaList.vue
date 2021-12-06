@@ -54,13 +54,13 @@
 
         <jet-dialog-modal :show="openModal" @close="openModal = false">
             <template #title>
-                삭제
+                <p class="text-black">삭제</p>
             </template>
 
             <template #content>
                 <div class="relative w-full mb-3 mt-8">
                     <input type="text" class="border-0 px-3 py-3 placeholder-blueGray-300
-                    text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none
+                    text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none text-black
                     focus:ring w-full ease-linear transition-all duration-150 font-bold"
                            placeholder="단어장 제목" value="삭제하시겠습니까?">
                 </div>

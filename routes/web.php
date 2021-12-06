@@ -101,6 +101,7 @@ Route::middleware(['auth:sanctum', 'verified'])->
            Route::get('/timer', [GameController::class, 'timer']);
            Route::post('/start/{room_id}', [GameController::class, 'game_start']);
            Route::post('/select', [GameController::class, 'select']);
+           Route::post('/select_second', [GameController::class, 'select_second']);
            Route::post('/answer', [GameController::class, 'answer']);
            Route::delete('/delete/{room_id}', [GameController::class, 'destroy']);
            Route::get('/{room_id}', [GameController::class, 'index']);
