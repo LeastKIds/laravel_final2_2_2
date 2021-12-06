@@ -129,6 +129,8 @@ export default {
             pass : true,
             timer_setting : '',
             timer : 0,
+            user : '',
+
 
         }
     },
@@ -139,10 +141,21 @@ export default {
     ,
     created() {
         this.room_info = this.room
+        axios.get('/api/auth')
+            .then(response => {
+                if(response.data.success === 1)
+                    this.user = response.data.user
+                else
+                    alert('새로고침 부탁해요')
+            })
+
+
+
         // console.log('room.'+this.room_info.id)
         // console.log(this.room_info)
         if(this.room_info.start === 1)
         {
+            clearInterval(this.timer_setting)
             this.start=true
             axios.post('/api/game/select_second',
                 {'quiz_number' : this.room_info.quiz_number, 'room_id' : this.room_info.id})
@@ -151,15 +164,27 @@ export default {
                     this.quiz_setting.answer_type = response.data.quiz.answer_type + '로 답하세요!'
                     this.quiz_setting.q = response.data.quiz.quiz
                     this.timer = response.data.quiz.timer
+                    console.log(response)
                     console.log(this.timer)
-                    this.timer = this.timer + 5 - parseInt(Date.now()/1000)
+                    console.log('ttttttt')
+                    this.timer = this.timer + 7 - parseInt(Date.now()/1000)
                     console.log(this.timer)
                     if(this.timer <=0)
                         this.timer = 0
                     const vm = this
+
                     this.timer_setting = setInterval( function () {
                         if(vm.timer <=0) {
                             vm.timer = 0
+                            if(parseInt(vm.room_info.admin) ===  vm.user.id) {
+                                axios.post('/api/game/wrong', {'room_id' : vm.room_info.id})
+                                    .then(response => {
+                                        // console.log(response)
+                                    }).catch(err => {
+                                    console.log(err)
+                                })
+                            }
+
                             clearInterval(vm.timer_setting)
                         }else
                             vm.timer = vm.timer -1
@@ -182,9 +207,10 @@ export default {
                     vm.room_info = e.room
                     e.room_messages.forEach( function (value, index, array) {
                         if(value.message !== null) {
-                            // console.log(index)
+                            console.log(value)
                             vm.chatting(index, value.message)
-                            vm.send_answer(value.message, vm)
+                            if(vm.room_info.start===1 && value.user_id === vm.user.id)
+                                vm.send_answer(value.message, vm)
                         }
 
                     })
@@ -194,7 +220,7 @@ export default {
                     alert('방장이 방을 나갔습니다.')
                     location.href='/game/list';
                 }else if(e.check===2) {
-
+                    clearInterval(vm.timer_setting)
                     vm.room_info = e.room
                     vm.start=true
                     axios.post('/api/game/select',
@@ -203,11 +229,20 @@ export default {
                         vm.quiz_setting.answer_type = response.data.quiz.answer_type + '로 답하세요!'
                         vm.quiz_setting.q = response.data.quiz.quiz
                         vm.timer = response.data.quiz.timer
-                        vm.timer = vm.timer + 5 - parseInt(Date.now()/1000)
+                        vm.timer = vm.timer + 7 - parseInt(Date.now()/1000)
 
                         vm.timer_setting = setInterval( function () {
                             if(vm.timer <=0) {
                                 vm.timer = 0
+                                if(parseInt(vm.room_info.admin) === vm.user.id) {
+                                    axios.post('/api/game/wrong', {'room_id' : vm.room_info.id})
+                                        .then(response => {
+
+                                        }).catch(err => {
+                                        console.log(err)
+                                    })
+                                }
+
                                 clearInterval(vm.timer_setting)
                             } else
                                 vm.timer = vm.timer -1
@@ -248,6 +283,25 @@ export default {
                     },2050)
 
                 }
+                else if(e.check===24) {
+                    // console.log(e)
+                    vm.wrong_message(vm, e.room_messages.wrong)
+                    setTimeout(function() {
+                        vm.next_quiz(vm)
+                    })
+                }
+                else if(e.check===241) {
+                    clearInterval(vm.timer_setting)
+                    vm.wrong_message(vm, e.room_messages.wrong)
+                    setTimeout(function () {
+                        vm.quiz_setting.answer_type = '우승자!!!'
+                        vm.quiz_setting.q = e.room_messages.winner.user.name
+                        setTimeout(function() {
+                            vm.start=false
+                            vm.pass=true
+                        },5000)
+                    },2000)
+                }
                 else{
                     vm.room_info = e.room
                     vm.player_list()
@@ -260,6 +314,7 @@ export default {
         sendMessage(index) {
             this.chat_log[index] = this.chat_input_log[index]
             this.chat_input_log[index] = ''
+            console.log('t1')
             axios.post('/api/game/messages/' + this.room_info.id, {'message' : this.chat_log[index]})
                 .then(response => {
                     // console.log(response)
@@ -296,7 +351,7 @@ export default {
         room_out() {
             axios.delete('/api/game/delete/'+this.room_info.id)
                 .then(response => {
-                    console.log(response)
+                    // console.log(response)
                     if(response.data.success === 1) {
                         window.Echo.leave('room.'+this.room_info.id)
                         location.href='/';
@@ -334,6 +389,7 @@ export default {
             })
         },
         send_answer(value, vm) {
+            console.log('t2')
             axios.post('/api/game/answer',
                 {'room_id' : vm.room_info.id, 'answer' : value})
             .then(response => {
@@ -343,6 +399,7 @@ export default {
             })
         },
         next_quiz(vm) {
+            clearInterval(vm.timer_setting)
             axios.post('/api/game/select',
                 {'quiz_number' : vm.room_info.quiz_number, 'room_id' : vm.room_info.id})
                 .then(response => {
@@ -351,12 +408,22 @@ export default {
                     vm.quiz_setting.q = response.data.quiz.quiz
                     vm.pass=true
                     vm.timer = response.data.quiz.timer
-                    console.log(vm.timer)
-                    vm.timer = vm.timer + 5 - parseInt(Date.now()/1000)
-
+                    // console.log(vm.timer)
+                    vm.timer = vm.timer + 7 - parseInt(Date.now()/1000)
                     vm.timer_setting = setInterval( function () {
                         if(vm.timer <=0) {
                             vm.timer = 0
+                            // console.log(vm.user.id)
+                            // console.log(parseInt(vm.room_info.admin))
+                            if(parseInt(vm.room_info.admin) === vm.user.id) {
+                                axios.post('/api/game/wrong', {'room_id' : vm.room_info.id})
+                                    .then(response => {
+                                        // console.log(response)
+                                    }).catch(err => {
+                                    console.log(err)
+                                })
+                            }
+
                             clearInterval(vm.timer_setting)
                         } else
                             vm.timer = vm.timer -1
@@ -391,10 +458,19 @@ export default {
                 // }
             })
         },
-        wrong_message(vm, answer, user) {
+        wrong_axios(vm) {
+            axios.post('/api/game/wrong',{'room_id' : vm.room_info.id})
+                .then(response => {
+                    if(response.success !== 1)
+                        alert('오류발생!')
+                }).catch(err => {
+                    console.log(err)
+            })
+        },
+        wrong_message(vm, answer) {
             let timerInterval
             Swal.fire({
-                title: '정답자 : ' + user,
+                title: '전원 오답!',
                 html: '정답 : ' + answer,
                 timer: 2000,
                 timerProgressBar: true,

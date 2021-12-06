@@ -278,4 +278,35 @@ class GameController extends Controller
         }
         return ['success' => 0];
     }
+
+    public function wrong(Request $request) {
+        $room_id = $request -> room_id;
+//        return $room_id;
+        $room = Room::find($room_id);
+        $quiz_number = $room -> quiz_number;
+
+        $quiz = Quizlet::where('room_id', $room_id) -> get();
+
+        if(count($quiz) <= $quiz_number+1) {
+            $room_message = RoomMessage::where('room_id',$room_id) ->
+            with('user')-> orderBy('point','desc') -> first();
+            $room -> start = 0;
+            $room -> quiz_number = 0;
+            $room -> save();
+
+            foreach($quiz as $q) {
+                $q -> delete();
+            }
+            MessageSent::dispatch(['winner' => $room_message,
+                'wrong' => $quiz[$quiz_number] -> answer,
+                'user' => auth() -> user(),], $room_id, 241, $room);
+            return ['success' => 1, 'message' =>'모두 끝났어요!'];
+        } else {
+            $room -> quiz_number = $quiz_number + 1;
+            $room -> save();
+            MessageSent::dispatch(['wrong' => $quiz[$quiz_number] -> answer], $room_id, 24, $room);
+            return ['success' => 1];
+        }
+
+    }
 }

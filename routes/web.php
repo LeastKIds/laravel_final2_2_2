@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\MainPageController;
 use App\Http\Controllers\OtherController;
@@ -102,10 +103,15 @@ Route::middleware(['auth:sanctum', 'verified'])->
            Route::post('/start/{room_id}', [GameController::class, 'game_start']);
            Route::post('/select', [GameController::class, 'select']);
            Route::post('/select_second', [GameController::class, 'select_second']);
+           Route::post('/wrong', [GameController::class, 'wrong']);
            Route::post('/answer', [GameController::class, 'answer']);
            Route::delete('/delete/{room_id}', [GameController::class, 'destroy']);
            Route::get('/{room_id}', [GameController::class, 'index']);
            Route::post('/member/{room_id}', [GameController::class, 'member_check']);
 
+        });
+
+        Route::prefix('auth') -> group(function() {
+           Route::get('/', [AuthController::class, 'index']);
         });
     });

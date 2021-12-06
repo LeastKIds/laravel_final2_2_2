@@ -21385,17 +21385,22 @@ __webpack_require__.r(__webpack_exports__);
       },
       pass: true,
       timer_setting: '',
-      timer: 0
+      timer: 0,
+      user: ''
     };
   },
   mounted: function mounted() {},
   created: function created() {
     var _this = this;
 
-    this.room_info = this.room; // console.log('room.'+this.room_info.id)
+    this.room_info = this.room;
+    axios.get('/api/auth').then(function (response) {
+      if (response.data.success === 1) _this.user = response.data.user;else alert('새로고침 부탁해요');
+    }); // console.log('room.'+this.room_info.id)
     // console.log(this.room_info)
 
     if (this.room_info.start === 1) {
+      clearInterval(this.timer_setting);
       this.start = true;
       axios.post('/api/game/select_second', {
         'quiz_number': this.room_info.quiz_number,
@@ -21405,14 +21410,26 @@ __webpack_require__.r(__webpack_exports__);
         _this.quiz_setting.answer_type = response.data.quiz.answer_type + '로 답하세요!';
         _this.quiz_setting.q = response.data.quiz.quiz;
         _this.timer = response.data.quiz.timer;
+        console.log(response);
         console.log(_this.timer);
-        _this.timer = _this.timer + 5 - parseInt(Date.now() / 1000);
+        console.log('ttttttt');
+        _this.timer = _this.timer + 7 - parseInt(Date.now() / 1000);
         console.log(_this.timer);
         if (_this.timer <= 0) _this.timer = 0;
         var vm = _this;
         _this.timer_setting = setInterval(function () {
           if (vm.timer <= 0) {
             vm.timer = 0;
+
+            if (parseInt(vm.room_info.admin) === vm.user.id) {
+              axios.post('/api/game/wrong', {
+                'room_id': vm.room_info.id
+              }).then(function (response) {// console.log(response)
+              })["catch"](function (err) {
+                console.log(err);
+              });
+            }
+
             clearInterval(vm.timer_setting);
           } else vm.timer = vm.timer - 1;
         }, 1000);
@@ -21431,9 +21448,9 @@ __webpack_require__.r(__webpack_exports__);
         vm.room_info = e.room;
         e.room_messages.forEach(function (value, index, array) {
           if (value.message !== null) {
-            // console.log(index)
+            console.log(value);
             vm.chatting(index, value.message);
-            vm.send_answer(value.message, vm);
+            if (vm.room_info.start === 1 && value.user_id === vm.user.id) vm.send_answer(value.message, vm);
           }
         });
       } else if (e.check === 3) {
@@ -21442,6 +21459,7 @@ __webpack_require__.r(__webpack_exports__);
         alert('방장이 방을 나갔습니다.');
         location.href = '/game/list';
       } else if (e.check === 2) {
+        clearInterval(vm.timer_setting);
         vm.room_info = e.room;
         vm.start = true;
         axios.post('/api/game/select', {
@@ -21451,10 +21469,19 @@ __webpack_require__.r(__webpack_exports__);
           vm.quiz_setting.answer_type = response.data.quiz.answer_type + '로 답하세요!';
           vm.quiz_setting.q = response.data.quiz.quiz;
           vm.timer = response.data.quiz.timer;
-          vm.timer = vm.timer + 5 - parseInt(Date.now() / 1000);
+          vm.timer = vm.timer + 7 - parseInt(Date.now() / 1000);
           vm.timer_setting = setInterval(function () {
             if (vm.timer <= 0) {
               vm.timer = 0;
+
+              if (parseInt(vm.room_info.admin) === vm.user.id) {
+                axios.post('/api/game/wrong', {
+                  'room_id': vm.room_info.id
+                }).then(function (response) {})["catch"](function (err) {
+                  console.log(err);
+                });
+              }
+
               clearInterval(vm.timer_setting);
             } else vm.timer = vm.timer - 1;
           }, 1000);
@@ -21490,6 +21517,23 @@ __webpack_require__.r(__webpack_exports__);
             vm.pass = true;
           }, 5000);
         }, 2050);
+      } else if (e.check === 24) {
+        // console.log(e)
+        vm.wrong_message(vm, e.room_messages.wrong);
+        setTimeout(function () {
+          vm.next_quiz(vm);
+        });
+      } else if (e.check === 241) {
+        clearInterval(vm.timer_setting);
+        vm.wrong_message(vm, e.room_messages.wrong);
+        setTimeout(function () {
+          vm.quiz_setting.answer_type = '우승자!!!';
+          vm.quiz_setting.q = e.room_messages.winner.user.name;
+          setTimeout(function () {
+            vm.start = false;
+            vm.pass = true;
+          }, 5000);
+        }, 2000);
       } else {
         vm.room_info = e.room;
         vm.player_list();
@@ -21500,6 +21544,7 @@ __webpack_require__.r(__webpack_exports__);
     sendMessage: function sendMessage(index) {
       this.chat_log[index] = this.chat_input_log[index];
       this.chat_input_log[index] = '';
+      console.log('t1');
       axios.post('/api/game/messages/' + this.room_info.id, {
         'message': this.chat_log[index]
       }).then(function (response) {// console.log(response)
@@ -21533,8 +21578,7 @@ __webpack_require__.r(__webpack_exports__);
       var _this3 = this;
 
       axios["delete"]('/api/game/delete/' + this.room_info.id).then(function (response) {
-        console.log(response);
-
+        // console.log(response)
         if (response.data.success === 1) {
           window.Echo.leave('room.' + _this3.room_info.id);
           location.href = '/';
@@ -21571,6 +21615,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     send_answer: function send_answer(value, vm) {
+      console.log('t2');
       axios.post('/api/game/answer', {
         'room_id': vm.room_info.id,
         'answer': value
@@ -21580,6 +21625,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     next_quiz: function next_quiz(vm) {
+      clearInterval(vm.timer_setting);
       axios.post('/api/game/select', {
         'quiz_number': vm.room_info.quiz_number,
         'room_id': vm.room_info.id
@@ -21588,12 +21634,23 @@ __webpack_require__.r(__webpack_exports__);
         vm.quiz_setting.answer_type = response.data.quiz.answer_type + '로 답하세요!';
         vm.quiz_setting.q = response.data.quiz.quiz;
         vm.pass = true;
-        vm.timer = response.data.quiz.timer;
-        console.log(vm.timer);
-        vm.timer = vm.timer + 5 - parseInt(Date.now() / 1000);
+        vm.timer = response.data.quiz.timer; // console.log(vm.timer)
+
+        vm.timer = vm.timer + 7 - parseInt(Date.now() / 1000);
         vm.timer_setting = setInterval(function () {
           if (vm.timer <= 0) {
-            vm.timer = 0;
+            vm.timer = 0; // console.log(vm.user.id)
+            // console.log(parseInt(vm.room_info.admin))
+
+            if (parseInt(vm.room_info.admin) === vm.user.id) {
+              axios.post('/api/game/wrong', {
+                'room_id': vm.room_info.id
+              }).then(function (response) {// console.log(response)
+              })["catch"](function (err) {
+                console.log(err);
+              });
+            }
+
             clearInterval(vm.timer_setting);
           } else vm.timer = vm.timer - 1;
         }, 1000);
@@ -21625,10 +21682,19 @@ __webpack_require__.r(__webpack_exports__);
         // }
       });
     },
-    wrong_message: function wrong_message(vm, answer, user) {
+    wrong_axios: function wrong_axios(vm) {
+      axios.post('/api/game/wrong', {
+        'room_id': vm.room_info.id
+      }).then(function (response) {
+        if (response.success !== 1) alert('오류발생!');
+      })["catch"](function (err) {
+        console.log(err);
+      });
+    },
+    wrong_message: function wrong_message(vm, answer) {
       var timerInterval;
       sweetalert2__WEBPACK_IMPORTED_MODULE_1___default().fire({
-        title: '정답자 : ' + user,
+        title: '전원 오답!',
         html: '정답 : ' + answer,
         timer: 2000,
         timerProgressBar: true,
