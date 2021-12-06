@@ -58,8 +58,11 @@ prefix('game') -> group(function () {
     Route::get('/{room_id}', [MainPageController::class, 'index_game']);
 
 //    Route::get('/{room_id}', [MainPageController::class, 'index_game_enter']);
+});
 
-
+Route::middleware(['auth:sanctum', 'verified'])->
+    prefix('help') -> group(function () {
+        Route::get('/', [MainPageController::class, 'index_help']);
 });
 
 

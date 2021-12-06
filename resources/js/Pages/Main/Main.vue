@@ -70,7 +70,7 @@
                                 </div>
                             </Link>
 
-                            <div class="mb-8 flex justify-between items-center w-full right-timeline">
+                            <Link class="mb-8 flex justify-between items-center w-full right-timeline" href="/help">
                                 <div class="order-1 w-5/12"></div>
 
                                 <div class="order-1  w-5/12 px-1 py-4">
@@ -80,7 +80,7 @@
                                         여기 저기서 베껴온 레이아웃의 출처를 밝혀보아요!
                                     </p>
                                 </div>
-                            </div>
+                            </Link>
                         </div>
                         <img class="mx-auto -mt-36 md:-mt-36" src="https://user-images.githubusercontent.com/54521023/116968861-ef21a000-acd2-11eb-95ac-a34b5b490265.png" />
                     </div>

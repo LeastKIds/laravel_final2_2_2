@@ -39,7 +39,7 @@
                     </li>
                     <li class="mr-3" >
                         <a class="inline-block hover:text-yellow-300
-                        hover:text-underline py-2 px-4" href="#" id="help">도움!</a>
+                        hover:text-underline py-2 px-4" href="/help" id="help">도움!</a>
                     </li>
                 </ul>
             </div>

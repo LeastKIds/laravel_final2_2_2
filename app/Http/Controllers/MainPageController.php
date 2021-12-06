@@ -107,4 +107,8 @@ class MainPageController extends Controller
 
         return ['success' => 1, 'room_message' => $room_message -> count()];
     }
+
+    public function index_help() {
+        return Inertia::render('Main/Help');
+    }
 }
