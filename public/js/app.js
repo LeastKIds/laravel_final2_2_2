@@ -22282,12 +22282,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Layouts_Layout_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./../Layouts/Layout.vue */ "./resources/js/Pages/Layouts/Layout.vue");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _Jetstream_DialogModal_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/Jetstream/DialogModal.vue */ "./resources/js/Jetstream/DialogModal.vue");
+
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "CreateWords",
   components: {
-    Layout: _Layouts_Layout_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
+    Layout: _Layouts_Layout_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
+    JetDialogModal: _Jetstream_DialogModal_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   props: ['voca', 'words'],
   data: function data() {
@@ -22311,7 +22314,12 @@ __webpack_require__.r(__webpack_exports__);
       },
       edit_button: [],
       word_error: [],
-      first_page: false
+      first_page: false,
+      start_game: false,
+      game: {
+        title: '',
+        message: ''
+      }
     };
   },
   mounted: function mounted() {
@@ -22320,7 +22328,33 @@ __webpack_require__.r(__webpack_exports__);
     this.words_x = this.words;
     this.update_voca.title = this.voca_x.title;
   },
-  methods: {}
+  methods: {
+    game_start_button: function game_start_button() {
+      if (this.words_x.length === 0) {
+        alert('최소한 하나의 단어는 있어야 합니다.');
+        return;
+      }
+
+      this.start_game = true;
+    },
+    game_start_button_start: function game_start_button_start() {
+      if (this.game.title === '') {
+        this.game.message = '꼭 필요해요!';
+        return;
+      }
+
+      console.log(this.voca_x.id);
+      axios__WEBPACK_IMPORTED_MODULE_1___default().post('/api/game/store', {
+        'name': this.game.title,
+        'voca_id': this.voca_x.id
+      }).then(function (response) {
+        console.log(response);
+        if (response.data.success === 1) location.href = "/game/" + response.data.room.id;else if (response.data.success === 0) alert('이미 진행 중인 게임이 있습니다. 그 게임에 들어가려면 [참가참가]를 눌러주세요');
+      })["catch"](function (err) {
+        console.log(err);
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -28578,8 +28612,36 @@ var _hoisted_7 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
 var _hoisted_8 = ["value"];
 var _hoisted_9 = ["value"];
 var _hoisted_10 = ["value"];
+var _hoisted_11 = {
+  "class": "w-full flex justify-center items-center"
+};
 
-var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+  "class": "text-black"
+}, "게임 생성", -1
+/* HOISTED */
+);
+
+var _hoisted_13 = {
+  "class": "relative w-full mb-3 mt-8"
+};
+
+var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "block uppercase text-blueGray-600 text-black text-xs font-bold mb-2",
+  "for": "full-name"
+}, "게임 제목", -1
+/* HOISTED */
+);
+
+var _hoisted_15 = {
+  key: 0,
+  "class": "flex items-center font-medium tracking-wide text-red-500 text-xs mt-1 ml-1"
+};
+var _hoisted_16 = {
+  "class": "justify-center"
+};
+
+var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   style: {
     "height": "100px"
   }
@@ -28589,6 +28651,8 @@ var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_layout = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("layout");
+
+  var _component_jet_dialog_modal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("jet-dialog-modal");
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_layout), _hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [_hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "text",
@@ -28620,7 +28684,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
       type: "text",
       placeholder: "한자",
-      "class": "text-center mb-2 bg-gray-100 p-2 rounded-lg border-2 border-indigo-500 shadow-md focus:outline-none focus:border-indigo-600 m-1",
+      "class": "text-center mb-2 bg-gray-100 p-2 rounded-lg border-2 border-indigo-500 shadow-md focus:outline-none text-black focus:border-indigo-600 m-1",
       readonly: "",
       value: word.kannzi
     }, null, 8
@@ -28628,7 +28692,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_8), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
       type: "text",
       placeholder: "히라가나",
-      "class": "text-center mb-2 bg-gray-100 p-2 rounded-lg border-2 border-indigo-500 shadow-md focus:outline-none focus:border-indigo-600 m-1",
+      "class": "text-center mb-2 bg-gray-100 p-2 rounded-lg border-2 border-indigo-500 shadow-md focus:outline-none text-black focus:border-indigo-600 m-1",
       readonly: "",
       value: word.hiragana
     }, null, 8
@@ -28636,7 +28700,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_9), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
       type: "text",
       placeholder: "한글",
-      "class": "text-center mb-2 bg-gray-100 p-2 rounded-lg border-2 border-indigo-500 shadow-md focus:outline-none focus:border-indigo-600 m-1",
+      "class": "text-center mb-2 bg-gray-100 p-2 rounded-lg border-2 border-indigo-500 shadow-md focus:outline-none text-black focus:border-indigo-600 m-1",
       readonly: "",
       value: word.korean
     }, null, 8
@@ -28644,7 +28708,48 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_10)]);
   }), 128
   /* KEYED_FRAGMENT */
-  ))]), _hoisted_11], 64
+  ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    "data-modal-toggle": "example2",
+    "data-modal-action": "open",
+    "class": "bg-purple-600 font-semibold text-white p-2 w-32 rounded-full hover:bg-purple-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300 m-8",
+    onClick: _cache[2] || (_cache[2] = function () {
+      return $options.game_start_button && $options.game_start_button.apply($options, arguments);
+    })
+  }, " 게임 시작 ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_jet_dialog_modal, {
+    show: $data.start_game,
+    onClose: _cache[5] || (_cache[5] = function ($event) {
+      return $data.start_game = false;
+    })
+  }, {
+    title: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [_hoisted_12];
+    }),
+    content: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [_hoisted_14, $data.game.message ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.game.message), 1
+      /* TEXT */
+      )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "text",
+        "class": "bg-gray-300 border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none text-black focus:ring w-full ease-linear transition-all duration-150",
+        placeholder: "게임 제목",
+        "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
+          return $data.game.title = $event;
+        })
+      }, null, 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.game.title]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        "class": "bg-yellow-600 text-white active:bg-blueGray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 text-left mr-5",
+        type: "button",
+        onClick: _cache[4] || (_cache[4] = function () {
+          return $options.game_start_button_start && $options.game_start_button_start.apply($options, arguments);
+        })
+      }, " 시작 ")])];
+    }),
+    _: 1
+    /* STABLE */
+
+  }, 8
+  /* PROPS */
+  , ["show"]), _hoisted_17], 64
   /* STABLE_FRAGMENT */
   );
 }
