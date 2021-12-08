@@ -84,7 +84,7 @@
             p-2 rounded-lg border-2 border-indigo-500 shadow-md focus:outline-none text-black
             focus:border-indigo-600 m-1" v-model="word.korean"/>
             <button class="p-2 pl-5 pr-5 bg-transparent border-2 border-green-500 text-green-500 text-lg rounded-lg hover:bg-green-500 hover:text-gray-100
-            focus:border-4 focus:border-green-300 m-1" @click="create_word">저장</button>
+            focus:border-4 focus:border-green-300 m-1" id="scroll" @click="create_word">저장</button>
         </div>
         <div style="text-align:center;" class="flex flex-col items-center justify-center">
              <span class="flex items-center font-medium tracking-wide text-red-500 text-xl
@@ -317,6 +317,8 @@ export default {
             axios.delete('/api/vocabulary/' + this.voca_x.id)
                 .then(response => {
                     console.log(response)
+                    alert('삭제성공')
+
                 }).catch(err => {
                     console.log(err)
             })
@@ -402,7 +404,10 @@ export default {
                         console.log('read_words')
                         console.log(this.first_page)
                         if(this.first_page) {
-                            window.scrollTo( 0, document.body.scrollHeight )
+                            // window.scrollTo( 0, document.body.scrollHeight-100 )
+
+                            let location = document.querySelector("#scroll").offsetTop;
+                            window.scrollTo({ top: location -300, behavior: "smooth" });
                             this.first_page = false
                         }
                         this.set_edit_button()

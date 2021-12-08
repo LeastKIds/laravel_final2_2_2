@@ -309,4 +309,10 @@ class GameController extends Controller
         }
 
     }
+
+    public function index_search($search) {
+        $rooms = Room::where('name', 'like', '%'.$search.'%') -> with('room_messages')  -> latest() -> paginate(12);
+
+        return $rooms;
+    }
 }

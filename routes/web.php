@@ -103,6 +103,7 @@ Route::middleware(['auth:sanctum', 'verified'])->
            Route::post('/messages/{room_id}', [GameController::class, 'send_messages']);
            Route::get('/member/{room_id}', [GameController::class, 'member']);
            Route::get('/timer', [GameController::class, 'timer']);
+           Route::get('/search/{search}', [GameController::class, 'index_search']);
            Route::post('/start/{room_id}', [GameController::class, 'game_start']);
            Route::post('/select', [GameController::class, 'select']);
            Route::post('/select_second', [GameController::class, 'select_second']);

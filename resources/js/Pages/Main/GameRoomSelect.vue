@@ -333,11 +333,11 @@ export default {
             this.search_axios()
         },
         search_axios() {
-            axios.get('/api/vocabulary/'+this.search_word)
+            axios.get('/api/game/search/'+this.search_word)
                 .then(response => {
-                    this.voca = response.data
-                    console.log(this.voca)
-                    this.page(this.voca)
+                    this.game_rooms = response.data
+                    console.log(this.game_rooms)
+                    this.page(this.game_rooms)
                 }).catch(err => {
                 console.log(err)
             })

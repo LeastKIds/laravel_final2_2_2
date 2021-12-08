@@ -21188,6 +21188,7 @@ __webpack_require__.r(__webpack_exports__);
     voca_delete: function voca_delete() {
       axios__WEBPACK_IMPORTED_MODULE_1___default()["delete"]('/api/vocabulary/' + this.voca_x.id).then(function (response) {
         console.log(response);
+        alert('삭제성공');
       })["catch"](function (err) {
         console.log(err);
       });
@@ -21274,7 +21275,12 @@ __webpack_require__.r(__webpack_exports__);
           console.log(_this4.first_page);
 
           if (_this4.first_page) {
-            window.scrollTo(0, document.body.scrollHeight);
+            // window.scrollTo( 0, document.body.scrollHeight-100 )
+            var _location = document.querySelector("#scroll").offsetTop;
+            window.scrollTo({
+              top: _location - 300,
+              behavior: "smooth"
+            });
             _this4.first_page = false;
           }
 
@@ -21855,11 +21861,11 @@ __webpack_require__.r(__webpack_exports__);
     search_axios: function search_axios() {
       var _this3 = this;
 
-      axios__WEBPACK_IMPORTED_MODULE_5___default().get('/api/vocabulary/' + this.search_word).then(function (response) {
-        _this3.voca = response.data;
-        console.log(_this3.voca);
+      axios__WEBPACK_IMPORTED_MODULE_5___default().get('/api/game/search/' + this.search_word).then(function (response) {
+        _this3.game_rooms = response.data;
+        console.log(_this3.game_rooms);
 
-        _this3.page(_this3.voca);
+        _this3.page(_this3.game_rooms);
       })["catch"](function (err) {
         console.log(err);
       });
@@ -27220,6 +27226,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* NEED_PATCH */
   ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.word.korean]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "p-2 pl-5 pr-5 bg-transparent border-2 border-green-500 text-green-500 text-lg rounded-lg hover:bg-green-500 hover:text-gray-100 focus:border-4 focus:border-green-300 m-1",
+    id: "scroll",
     onClick: _cache[7] || (_cache[7] = function () {
       return $options.create_word && $options.create_word.apply($options, arguments);
     })
