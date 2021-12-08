@@ -147,6 +147,7 @@
     import JetLabel from '@/Jetstream/Label.vue'
     import JetValidationErrors from '@/Jetstream/ValidationErrors.vue'
     import { Head, Link } from '@inertiajs/inertia-vue3';
+    import Swal from 'sweetalert2'
 
     export default defineComponent({
         components: {
@@ -211,7 +212,35 @@
                     return
 
                 this.form.post(this.route('register'), {
-                    onFinish: () => this.form.reset('password', 'password_confirmation'),
+                    onFinish: () => {
+
+                        return this.form.reset('password', 'password_confirmation')
+                    },
+                    onSuccess : () => {
+                        // const Toast = Swal.mixin({
+                        //     toast: true,
+                        //     position: 'top-end',
+                        //     showConfirmButton: false,
+                        //     timer: 3000,
+                        //     timerProgressBar: true,
+                        //     didOpen: (toast) => {
+                        //         toast.addEventListener('mouseenter', Swal.stopTimer)
+                        //         toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        //     }
+                        // })
+                        //
+                        // Toast.fire({
+                        //     icon: 'success',
+                        //     title: '회원가입 성공!'
+                        // })
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: '회원가입 성공!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+                    }
                 })
             },
             toggle(){

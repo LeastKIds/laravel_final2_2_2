@@ -116,6 +116,7 @@
     import JetLabel from '@/Jetstream/Label.vue'
     import JetValidationErrors from '@/Jetstream/ValidationErrors.vue'
     import { Head, Link } from '@inertiajs/inertia-vue3';
+    import Swal from "sweetalert2";
 
     export default defineComponent({
         components: {
@@ -183,6 +184,24 @@
                     }))
                     .post(this.route('login'), {
                         onFinish: () => this.form.reset('password'),
+                        onSuccess : () => {
+                            const Toast = Swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000,
+                                timerProgressBar: true,
+                                didOpen: (toast) => {
+                                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                }
+                            })
+
+                            Toast.fire({
+                                icon: 'success',
+                                title: '로그인 성공!'
+                            })
+                        }
                     })
             },
             toggle() {

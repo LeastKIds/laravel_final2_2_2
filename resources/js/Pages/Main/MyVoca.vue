@@ -236,7 +236,7 @@
                 px-6 py-3 rounded shadow hover:shadow-lg outline-none
                 focus:outline-none mr-1 mb-1 ease-linear transition-all
                 duration-150 text-right" type="button" @click="save_voca">
-                        단어 추가하기
+                        단어장 추가하기
                     </button>
                 </div>
 
@@ -310,7 +310,9 @@ import Pagination from './../Button/Pagination.vue'
 import Footer from './../Layouts/Footer.vue';
 
 
+
 import axios from 'axios'
+import Swal from "sweetalert2";
 export default {
     name: "MyVoca",
     components: {
@@ -373,6 +375,7 @@ export default {
                         console.log(response.data)
 
                         const url = '/vocabulary/' + response.data.voca.id
+
                         location.href= url
                     }else {
                         alert('오류 발생! 잠시 후, 다시 시도해 주세요.')

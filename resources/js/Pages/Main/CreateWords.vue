@@ -32,7 +32,7 @@
                     <button class="ml-2 p-2 pl-5 pr-5 bg-transparent border-2
                     border-red-500 text-red-500 text-lg rounded-lg
                     hover:bg-red-500 hover:text-gray-100 focus:border-4
-                    focus:border-red-300" @click="open_modal">삭제</button>
+                    focus:border-red-300" @click="voca_delete">삭제</button>
                 </div>
 
 
@@ -110,41 +110,41 @@
 
 
 
-        <jet-dialog-modal :show="openModal" @close="openModal = false">
-            <template #title>
-                <p class="text-black">삭제</p>
-            </template>
+<!--        <jet-dialog-modal :show="openModal" @close="openModal = false">-->
+<!--            <template #title>-->
+<!--                <p class="text-black">삭제</p>-->
+<!--            </template>-->
 
-            <template #content>
-                <div class="relative w-full mb-3 mt-8">
-                    <input type="text" class="border-0 px-3 py-3 placeholder-blueGray-300
-                    text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none
-                    focus:ring w-full ease-linear transition-all duration-150 font-bold text-black"
-                           placeholder="단어장 제목" value="삭제하시겠습니까?" readonly>
-                </div>
-                <div class="justify-center">
-                    <button class="bg-yellow-600 text-white
-                active:bg-blueGray-600 text-sm font-bold uppercase
-                px-6 py-3 rounded shadow hover:shadow-lg outline-none
-                focus:outline-none mr-1 mb-1 ease-linear transition-all
-                duration-150 text-left mr-5" type="button" @click="close_modal">
-                        아뇨
-                    </button>
+<!--            <template #content>-->
+<!--                <div class="relative w-full mb-3 mt-8">-->
+<!--                    <input type="text" class="border-0 px-3 py-3 placeholder-blueGray-300-->
+<!--                    text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none-->
+<!--                    focus:ring w-full ease-linear transition-all duration-150 font-bold text-black"-->
+<!--                           placeholder="단어장 제목" value="삭제하시겠습니까?" readonly>-->
+<!--                </div>-->
+<!--                <div class="justify-center">-->
+<!--                    <button class="bg-yellow-600 text-white-->
+<!--                active:bg-blueGray-600 text-sm font-bold uppercase-->
+<!--                px-6 py-3 rounded shadow hover:shadow-lg outline-none-->
+<!--                focus:outline-none mr-1 mb-1 ease-linear transition-all-->
+<!--                duration-150 text-left mr-5" type="button" @click="close_modal">-->
+<!--                        아뇨-->
+<!--                    </button>-->
 
-                    <button class="bg-red-400 text-white
-                active:bg-blueGray-600 text-sm font-bold uppercase
-                px-6 py-3 rounded shadow hover:shadow-lg outline-none
-                focus:outline-none mr-1 mb-1 ease-linear transition-all
-                duration-150 text-right" type="button" @click="voca_delete">
-                        예ㅖ
-                    </button>
-                </div>
-
-
-            </template>
+<!--                    <button class="bg-red-400 text-white-->
+<!--                active:bg-blueGray-600 text-sm font-bold uppercase-->
+<!--                px-6 py-3 rounded shadow hover:shadow-lg outline-none-->
+<!--                focus:outline-none mr-1 mb-1 ease-linear transition-all-->
+<!--                duration-150 text-right" type="button" @click="voca_delete">-->
+<!--                        예ㅖ-->
+<!--                    </button>-->
+<!--                </div>-->
 
 
-        </jet-dialog-modal>
+<!--            </template>-->
+
+
+<!--        </jet-dialog-modal>-->
 
 
 
@@ -239,6 +239,8 @@
 import Layout from './../Layouts/Layout.vue';
 import axios from 'axios'
 import JetDialogModal from '@/Jetstream/DialogModal.vue'
+import Swal from 'sweetalert2'
+
 export default {
     name: "CreateWords",
     components: {
@@ -314,14 +316,36 @@ export default {
             })
         },
         voca_delete() {
-            axios.delete('/api/vocabulary/' + this.voca_x.id)
-                .then(response => {
-                    console.log(response)
-                    alert('삭제성공')
+            Swal.fire({
+                title: '삭제하시겠습니까?',
+                showDenyButton: true,
+                showCancelButton: true,
+                confirmButtonText: '삭제',
+                denyButtonText: `아뇨?`,
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
 
-                }).catch(err => {
-                    console.log(err)
+                    axios.delete('/api/vocabulary/' + this.voca_x.id)
+                        .then(response => {
+                            console.log(response)
+                            if(response.data.success === 1) {
+                                Swal.fire('삭제완료!', '', 'success')
+                                    .then(function() {
+                                        location.href='/vocabulary'
+                                        // window.history.back()
+                                    })
+                            }
+                        }).catch(err => {
+                        console.log(err)
+                    })
+                } else if (result.isDenied) {
+                    Swal.fire('취소해서 다행이에요', '', 'error')
+                }
             })
+
+
+
         },
         open_modal() {
             this.openModal = true

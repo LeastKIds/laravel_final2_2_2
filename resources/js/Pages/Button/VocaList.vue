@@ -47,7 +47,7 @@
             <button class="px-4 py-2 rounded-md text-sm font-medium border
             focus:outline-none focus:ring transition text-yellow-600 border-yellow-600
             hover:text-white hover:bg-yellow-600 active:bg-yellow-700 focus:ring-yellow-300 m-3"
-                    type="submit" @click="open_modal">삭제</button>
+                    type="submit" @click="voca_delete">삭제</button>
         </div>
 
 
@@ -93,6 +93,7 @@
 <script>
 import JetDialogModal from '@/Jetstream/DialogModal.vue'
 import axios from 'axios'
+import Swal from "sweetalert2";
 // import Toggle from '@vueform/toggle'
 
 export default {
@@ -129,14 +130,35 @@ export default {
         },
         voca_delete() {
             console.log('delete')
-            axios.delete('/api/vocabulary/'+this.voca.id)
-                .then(response => {
-                    console.log(response)
-                    this.close_modal()
-                    this.$emit('read')
-                }).catch(err => {
-                    console.log(err)
+            const vm = this
+            Swal.fire({
+                title: '삭제하시겠습니까?',
+                showDenyButton: true,
+                showCancelButton: true,
+                confirmButtonText: '삭제',
+                denyButtonText: `아뇨?`,
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+
+                    axios.delete('/api/vocabulary/'+this.voca.id)
+                        .then(response => {
+                            console.log(response)
+                            Swal.fire('삭제완료!', '', 'success')
+                                .then(function() {
+                                    vm.$emit('read')
+                                })
+                            // this.close_modal()
+
+                        }).catch(err => {
+                        console.log(err)
+                    })
+                } else if (result.isDenied) {
+                    Swal.fire('취소해서 다행이에요', '', 'error')
+                }
             })
+
+
         },
         open_voca() {
             axios.patch('/api/vocabulary/open/' + this.voca.id)
