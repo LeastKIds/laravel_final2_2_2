@@ -1,119 +1,15 @@
 <template>
-    <div>
-        <layout></layout>
-        <div style="height:100px;">
-        </div>
-
-        <div style="text-align:center;" class="flex flex-col items-center justify-center text-gray-700">
-            <div class="max-w-md py-4 px-8 bg-white shadow-lg rounded-lg my-20">
-                <div class="relative w-full mb-3 mt-8">
-                    <label class="block uppercase text-blueGray-600
-                    text-xs font-bold mb-2" for="full-name">단어장 제목</label>
-
-                    <input type="text" class="bg-gray-300 border-0 px-3 py-3 placeholder-blueGray-300
-                    text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none
-                    focus:ring w-full ease-linear transition-all duration-150" readonly
-                           placeholder="단어장 제목" v-model="update_voca.title">
-                </div>
-
-                <div class="relative w-full mb-3">
-                    <label class="block uppercase text-blueGray-600
-                    text-xs font-bold mb-2" for="message">설명</label>
-                    <textarea rows="4" cols="80" class="bg-gray-300 border-0 px-3 py-3 placeholder-blueGray-300
-                    text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none
-                    focus:ring w-full" placeholder="설명 써줘요" v-model="update_voca.message" readonly></textarea>
-                </div>
-
-
-            </div>
-
-
-
-
-
-        </div>
-        <div style="text-align:center;" v-for="(word,index) in words_x" :key="word.id">
-            <input type="text" placeholder="한자" class="text-center mb-2 bg-gray-100 p-2
-            rounded-lg border-2 border-indigo-500 shadow-md focus:outline-none text-black
-            focus:border-indigo-600 m-1" readonly :value="word.kannzi" />
-            <input type="text" placeholder="히라가나" class="text-center mb-2 bg-gray-100
-            p-2 rounded-lg border-2 border-indigo-500 shadow-md focus:outline-none  text-black
-            focus:border-indigo-600 m-1" readonly :value="word.hiragana" />
-            <input type="text" placeholder="한글" class="text-center mb-2 bg-gray-100
-             p-2 rounded-lg border-2 border-indigo-500 shadow-md focus:outline-none text-black
-              focus:border-indigo-600 m-1" readonly :value="word.korean" />
-
-
-
-
-        </div>
-
-
-
-
-
-
-
-
-
-
-    </div>
-
-    <div class="w-full  flex justify-center items-center">
-        <button
-            data-modal-toggle="example2"
-            data-modal-action="open"
-            class="bg-purple-600 font-semibold text-white p-2 w-32 rounded-full hover:bg-purple-700 focus:outline-none focus:ring shadow-lg hover:shadow-none transition-all duration-300 m-8"
-            @click="game_start_button"
-        >
-            게임 시작
-        </button>
-    </div>
-
-
-    <jet-dialog-modal :show="start_game" @close="start_game = false">
-        <template #title>
-            <p class="text-black">게임 생성</p>
-        </template>
-
-        <template #content>
-            <div class="relative w-full mb-3 mt-8">
-                <label class="block uppercase text-blueGray-600 text-black
-                    text-xs font-bold mb-2" for="full-name">게임 제목</label>
-                <span class="flex items-center font-medium tracking-wide text-red-500 text-xs
-                mt-1 ml-1" v-if="game.message">{{game.message}}</span>
-                <input type="text" class="bg-gray-300 border-0 px-3 py-3 placeholder-blueGray-300
-                    text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none text-black
-                    focus:ring w-full ease-linear transition-all duration-150"
-                       placeholder="게임 제목" v-model="game.title">
-
-            </div>
-
-            <div class="justify-center">
-                <button class="bg-yellow-600 text-white
-                active:bg-blueGray-600 text-sm font-bold uppercase
-                px-6 py-3 rounded shadow hover:shadow-lg outline-none
-                focus:outline-none mr-1 mb-1 ease-linear transition-all
-                duration-150 text-left mr-5" type="button" @click="game_start_button_start">
-                    시작
-                </button>
-            </div>
-
-
-        </template>
-
-
-    </jet-dialog-modal>
-
-
-
-    <div class="w-full min-h-screen flex items-center justify-center bg-black -mt-36">
+    <div class="w-full min-h-screen flex items-center justify-center bg-black">
         <div class="md:w-2/3 w-full px-4 text-white flex flex-col">
+            <div class="w-full text-7xl font-bold">
+                <h1 class="w-full md:w-2/3">How can we help you. get
+                    in touch</h1>
+            </div>
             <div class="flex mt-8 flex-col md:flex-row md:justify-between">
-                <p class="w-full md:w-2/3 text-gray-400">여기저기서 배껴온 css를 활용해 홈페이지를 만들었어요. 혹시 코드가 궁금하시다면 옆에 버튼을 눌러주세요</p>
-                <a class="w-50 pt-6 md:pt-0" href="https://github.com/LeastKIds/laravel_final2_2_2">
-                    <a class="bg-red-500 justify-center text-center rounded-lg shadow px-10 py-3 flex items-center">바로가기</a>
-                </a>
+                <p class="w-full md:w-2/3 text-gray-400">To ensure that all Wikipedia content is verifiable, anyone may question an uncited claim. If your work has been tagged</p>
+                <div class="w-44 pt-6 md:pt-0">
+                    <a class="bg-red-500 justify-center text-center rounded-lg shadow px-10 py-3 flex items-center">Contact US</a>
+                </div>
             </div>
             <div class="flex flex-col">
                 <div class="flex mt-24 mb-12 flex-row justify-between">
@@ -127,11 +23,10 @@
                             <path d="M75.1532 1.85938C75.1532 2.26562 75.1219 2.77083 75.0594 3.375C74.9969 3.96875 74.9136 4.63542 74.8094 5.375C74.7157 6.11458 74.6011 6.90625 74.4657 7.75C74.3303 8.58333 74.1896 9.44271 74.0438 10.3281C73.898 11.2135 73.7469 12.1094 73.5907 13.0156C73.4448 13.9115 73.3042 14.7812 73.1688 15.625L75.5907 13.8438C76.3094 13.3125 76.8771 12.875 77.2938 12.5312C77.7209 12.1771 77.9813 11.901 78.075 11.7031C78.1688 11.4948 78.0959 11.3594 77.8563 11.2969C77.6271 11.224 77.2261 11.1979 76.6532 11.2188L76.5125 9.98438C76.9709 9.91146 77.4344 9.84375 77.9032 9.78125C78.3719 9.71875 78.825 9.66667 79.2625 9.625C79.7 9.57292 80.1167 9.53646 80.5125 9.51562C80.9084 9.48438 81.273 9.46875 81.6063 9.46875C82.2625 9.46875 82.7 9.56771 82.9188 9.76562C83.148 9.96354 83.2625 10.2396 83.2625 10.5938C83.2625 10.75 83.148 10.9635 82.9188 11.2344C82.7 11.4948 82.3719 11.8021 81.9344 12.1562C81.5073 12.5 80.9865 12.8906 80.3719 13.3281C79.7573 13.7552 79.0594 14.2083 78.2782 14.6875L76.2782 15.9219C76.5282 16.2031 76.773 16.5365 77.0125 16.9219C77.2625 17.2969 77.4969 17.6875 77.7157 18.0938C77.9448 18.5 78.1688 18.901 78.3875 19.2969C78.6063 19.6927 78.8198 20.0469 79.0282 20.3594C79.2469 20.6719 79.4553 20.9271 79.6532 21.125C79.8615 21.3125 80.0698 21.4062 80.2782 21.4062C80.5178 21.4062 80.825 21.3698 81.2 21.2969C81.5855 21.2135 81.9761 21.0625 82.3719 20.8438L82.95 22C82.6063 22.2917 82.2157 22.5938 81.7782 22.9062C81.3511 23.2083 80.924 23.4896 80.4969 23.75C80.0698 24 79.6688 24.2031 79.2938 24.3594C78.9188 24.526 78.6115 24.6094 78.3719 24.6094C78.0282 24.6094 77.6948 24.4583 77.3719 24.1562C77.049 23.8646 76.7313 23.4844 76.4188 23.0156C76.1167 22.5365 75.8146 22.0052 75.5125 21.4219C75.2209 20.8281 74.9292 20.2396 74.6375 19.6562C74.3563 19.0625 74.0803 18.5052 73.8094 17.9844C73.5386 17.4531 73.273 17.0156 73.0125 16.6719C72.898 17.4115 72.7938 18.1094 72.7 18.7656C72.6167 19.4219 72.549 20.0208 72.4969 20.5625C72.4553 21.0938 72.4292 21.5521 72.4188 21.9375C72.4188 22.3229 72.4448 22.6094 72.4969 22.7969C72.4032 22.849 72.2469 22.9219 72.0282 23.0156C71.8198 23.1094 71.5803 23.2188 71.3094 23.3438C71.0386 23.4688 70.7521 23.599 70.45 23.7344C70.148 23.8594 69.8615 23.9792 69.5907 24.0938C69.3303 24.2188 69.0959 24.3281 68.8875 24.4219C68.6792 24.526 68.5334 24.599 68.45 24.6406L67.7469 24C67.7886 23.6979 67.8615 23.2292 67.9657 22.5938C68.0698 21.9479 68.1896 21.1979 68.325 20.3438C68.4709 19.4792 68.6271 18.5417 68.7938 17.5312C68.9709 16.5104 69.1428 15.4688 69.3094 14.4062C69.4761 13.3438 69.6375 12.2969 69.7938 11.2656C69.9605 10.224 70.1063 9.25 70.2313 8.34375C70.3563 7.4375 70.4553 6.63021 70.5282 5.92188C70.6011 5.21354 70.6375 4.66146 70.6375 4.26562C70.6375 4.00521 70.6219 3.80208 70.5907 3.65625C70.5594 3.51042 70.5125 3.40104 70.45 3.32812C70.3875 3.25521 70.3094 3.21354 70.2157 3.20312C70.1219 3.18229 70.0125 3.17188 69.8875 3.17188C69.8042 3.17188 69.6792 3.19792 69.5125 3.25C69.3459 3.29167 69.174 3.33854 68.9969 3.39062C68.799 3.45312 68.5855 3.52083 68.3563 3.59375L68.0594 2.35938C68.4969 2.16146 69.023 1.94271 69.6375 1.70312C70.2625 1.45312 70.8771 1.22396 71.4813 1.01562C72.0959 0.796875 72.6532 0.614583 73.1532 0.46875C73.6636 0.322917 74.023 0.25 74.2313 0.25C74.3771 0.25 74.5073 0.265625 74.6219 0.296875C74.7365 0.328125 74.8303 0.401042 74.9032 0.515625C74.9865 0.619792 75.049 0.78125 75.0907 1C75.1323 1.20833 75.1532 1.49479 75.1532 1.85938Z" fill="white"/>
                         </svg>
                     </div>
-                    <a class="hidden md:block cursor-pointer text-gray-600 hover:text-white uppercase" href="/">홈</a>
-                    <a class="hidden md:block cursor-pointer text-gray-600 hover:text-white uppercase" href="/game/list">참가참가</a>
-                    <a class="hidden md:block cursor-pointer text-gray-600 hover:text-white uppercase" href="/vocabulary">내 단어장</a>
-                    <a class="hidden md:block cursor-pointer text-gray-600 hover:text-white uppercase" href="/other">남 단어장</a>
-                    <a class="hidden md:block cursor-pointer text-gray-600 hover:text-white uppercase" href="/help">도움!</a>
+                    <a class="hidden md:block cursor-pointer text-gray-600 hover:text-white uppercase">About</a>
+                    <a class="hidden md:block cursor-pointer text-gray-600 hover:text-white uppercase">Services</a>
+                    <a class="hidden md:block cursor-pointer text-gray-600 hover:text-white uppercase">Why us</a>
+                    <a class="hidden md:block cursor-pointer text-gray-600 hover:text-white uppercase">Contact</a>
                     <div class="flex flex-row space-x-8 items-center justify-between">
                         <a>
                             <svg width="6" height="12" viewBox="0 0 6 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -160,84 +55,10 @@
 </template>
 
 <script>
-import Layout from './../Layouts/Layout.vue';
-import axios from 'axios'
-import JetDialogModal from '@/Jetstream/DialogModal.vue'
-
 export default {
-    name: "CreateWords",
-    components: {
-        Layout,
-        JetDialogModal,
-    },
-    props: ['voca','words'],
-    data() {
-        return{
-            voca_x : '',
-            words_x : '',
-            error : {
-                title : '',
-                message : '',
-            },
-            update_voca : {
-                title : '',
-                message : '',
-            },
-            check : true,
-            openModal : false,
-            word : {
-                kannzi : '',
-                hiragana : '',
-                korean : '',
-            },
-            edit_button : [],
-            word_error : [],
-            first_page : false,
-            start_game : false,
-            game : {
-                title : '',
-                message : '',
-            }
-        }
-    },
-    mounted () {
-        console.log(this.words)
-        this.voca_x = this.voca
-        this.words_x = this.words
-        this.update_voca.title = this.voca_x.title
-
-
-    },
-    methods : {
-        game_start_button() {
-            if(this.words_x.length === 0) {
-                alert('최소한 하나의 단어는 있어야 합니다.')
-                return
-            }
-            this.start_game = true
-        },
-        game_start_button_start() {
-            if(this.game.title ===''){
-                this.game.message='꼭 필요해요!'
-                return
-            }
-
-            console.log(this.voca_x.id)
-
-            axios.post('/api/game/store', {'name' : this.game.title, 'voca_id' : this.voca_x.id})
-                .then(response => {
-                    console.log(response)
-                    if(response.data.success === 1)
-                        location.href="/game/" + response.data.room.id;
-                    else if(response.data.success === 0)
-                        alert('이미 진행 중인 게임이 있습니다. 그 게임에 들어가려면 [참가참가]를 눌러주세요')
-
-                }).catch(err => {
-                console.log(err)
-            })
-
-
-        }
+    name: "Footer",
+    mounted() {
+        console.log('FOOOOOOOTER')
     }
 }
 </script>
