@@ -121,7 +121,7 @@ class GameController extends Controller
         $room_message = RoomMessage::where('room_id', $room_id) -> get();
         $room_member = $room_message -> count();
 
-        if($room_member >= 4)
+        if($room_member > 4)
             return ['success'=> 0, 'message' => '인원 초과!'];
         else
             return ['success'=> 1, 'message' => '어서오세요!'];

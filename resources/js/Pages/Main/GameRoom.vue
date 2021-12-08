@@ -141,6 +141,7 @@ export default {
     ,
     created() {
         this.room_info = this.room
+        this.member_check()
         axios.get('/api/auth')
             .then(response => {
                 if(response.data.success === 1)
@@ -194,7 +195,7 @@ export default {
             })
         }
 
-        this.member_check()
+
         this.players = this.users
         this.player_list()
 
