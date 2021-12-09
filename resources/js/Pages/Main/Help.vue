@@ -53,8 +53,8 @@
         <div class="md:w-2/3 w-full px-4 text-white flex flex-col">
             <div class="flex mt-8 flex-col md:flex-row md:justify-between">
                 <p class="w-full md:w-2/3 text-gray-400">여기저기서 배껴온 css를 활용해 홈페이지를 만들었어요. 혹시 코드가 궁금하시다면 옆에 버튼을 눌러주세요</p>
-                <a class="w-50 pt-6 md:pt-0" href="https://github.com/LeastKIds/laravel_final2_2_2">
-                    <a class="bg-red-500 justify-center text-center rounded-lg shadow px-10 py-3 flex items-center">바로가기</a>
+                <a class="w-50 pt-6 md:pt-0">
+                    <a class="bg-red-500 justify-center text-center rounded-lg shadow px-10 py-3 flex items-center" href="https://github.com/LeastKIds/laravel_final2_2_2">바로가기</a>
                 </a>
             </div>
             <div class="flex flex-col">
