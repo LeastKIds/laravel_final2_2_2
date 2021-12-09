@@ -216,9 +216,9 @@ export default {
                     this.quiz_setting.answer_type = response.data.quiz.answer_type + '로 답하세요!'
                     this.quiz_setting.q = response.data.quiz.quiz
                     this.timer = response.data.quiz.timer
-                    console.log(response)
+                    // console.log(response)
                     console.log(this.timer)
-                    console.log('ttttttt')
+                    // console.log('ttttttt')
                     this.timer = this.timer + 7 - parseInt(Date.now()/1000)
                     console.log(this.timer)
                     if(this.timer <=0)
@@ -336,14 +336,18 @@ export default {
 
                 }
                 else if(e.check===24) {
-                    // console.log(e)
+                    console.log(e)
+                    vm.room_info = e.room
                     vm.wrong_message(vm, e.room_messages.wrong)
+                    // console.log('5555555555555555555555555555')
                     setTimeout(function() {
+                        // console.log('1111111111111111111111111111')
                         vm.next_quiz(vm)
-                    })
+                    }, 2050)
                 }
                 else if(e.check===241) {
                     clearInterval(vm.timer_setting)
+                    vm.room_info = e.room
                     vm.wrong_message(vm, e.room_messages.wrong)
                     setTimeout(function () {
                         vm.quiz_setting.answer_type = '우승자!!!'
@@ -352,7 +356,7 @@ export default {
                             vm.start=false
                             vm.pass=true
                         },5000)
-                    },2000)
+                    },2050)
                 }
                 else{
                     vm.room_info = e.room
@@ -452,10 +456,12 @@ export default {
         },
         next_quiz(vm) {
             clearInterval(vm.timer_setting)
+            // console.log('3333333333333333')
+            console.log(vm.room_info.quiz_number)
             axios.post('/api/game/select',
                 {'quiz_number' : vm.room_info.quiz_number, 'room_id' : vm.room_info.id})
                 .then(response => {
-                    // console.log(response)
+                    console.log(response)
                     vm.quiz_setting.answer_type = response.data.quiz.answer_type + '로 답하세요!'
                     vm.quiz_setting.q = response.data.quiz.quiz
                     vm.pass=true

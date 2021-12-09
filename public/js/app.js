@@ -21523,10 +21523,10 @@ __webpack_require__.r(__webpack_exports__);
         // console.log(response)
         _this.quiz_setting.answer_type = response.data.quiz.answer_type + '로 답하세요!';
         _this.quiz_setting.q = response.data.quiz.quiz;
-        _this.timer = response.data.quiz.timer;
-        console.log(response);
-        console.log(_this.timer);
-        console.log('ttttttt');
+        _this.timer = response.data.quiz.timer; // console.log(response)
+
+        console.log(_this.timer); // console.log('ttttttt')
+
         _this.timer = _this.timer + 7 - parseInt(Date.now() / 1000);
         console.log(_this.timer);
         if (_this.timer <= 0) _this.timer = 0;
@@ -21631,13 +21631,17 @@ __webpack_require__.r(__webpack_exports__);
           }, 5000);
         }, 2050);
       } else if (e.check === 24) {
-        // console.log(e)
-        vm.wrong_message(vm, e.room_messages.wrong);
+        console.log(e);
+        vm.room_info = e.room;
+        vm.wrong_message(vm, e.room_messages.wrong); // console.log('5555555555555555555555555555')
+
         setTimeout(function () {
+          // console.log('1111111111111111111111111111')
           vm.next_quiz(vm);
-        });
+        }, 2050);
       } else if (e.check === 241) {
         clearInterval(vm.timer_setting);
+        vm.room_info = e.room;
         vm.wrong_message(vm, e.room_messages.wrong);
         setTimeout(function () {
           vm.quiz_setting.answer_type = '우승자!!!';
@@ -21646,7 +21650,7 @@ __webpack_require__.r(__webpack_exports__);
             vm.start = false;
             vm.pass = true;
           }, 5000);
-        }, 2000);
+        }, 2050);
       } else {
         vm.room_info = e.room;
         vm.player_list();
@@ -21738,12 +21742,14 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     next_quiz: function next_quiz(vm) {
-      clearInterval(vm.timer_setting);
+      clearInterval(vm.timer_setting); // console.log('3333333333333333')
+
+      console.log(vm.room_info.quiz_number);
       axios.post('/api/game/select', {
         'quiz_number': vm.room_info.quiz_number,
         'room_id': vm.room_info.id
       }).then(function (response) {
-        // console.log(response)
+        console.log(response);
         vm.quiz_setting.answer_type = response.data.quiz.answer_type + '로 답하세요!';
         vm.quiz_setting.q = response.data.quiz.quiz;
         vm.pass = true;
